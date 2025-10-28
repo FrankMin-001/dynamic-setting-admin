@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>yml</artifactId>
+        <groupId>com.smalldragon.yml</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yml-framework</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        用来存放封装的依赖模块
+    </description>
+
+    <modules>
+        <module>yml-mybatis-plus</module>
+        <module>yml-spring-boot-start-web</module>
+        <module>yml-common</module>
+        <module>yml-redisson</module>
+    </modules>
+
+</project>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yml-function</artifactId>
+    <packaging>pom</packaging>
+
+    <parent>
+        <artifactId>yml</artifactId>
+        <groupId>com.smalldragon.yml</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modules>
+        <module>yml-function-biz</module>
+        <module>yml-function-api</module>
+    </modules>
+
+    <description>
+        该模块集成了各种各样的案例以及各种场景代码,比如高并发查询,高并发插入,消息队列,订单,秒杀等等功能
+        主要用于对所学知识的一种运用
+    </description>
+
+</project>
