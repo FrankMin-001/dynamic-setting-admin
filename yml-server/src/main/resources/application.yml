@@ -44,6 +44,14 @@ spring:
         max-idle: 10
         # 连接池中的最小空闲连接
         min-idle: 1
+  
+  # Spring Session Redis 配置
+  session:
+    store-type: redis
+    timeout: 7200 # Session 过期时间（秒），2小时
+    redis:
+      flush-mode: on_save
+      namespace: blbb:session
 
 mybatis-plus:
   configuration:

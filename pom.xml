@@ -34,6 +34,7 @@
         <mysql-connector.version>8.4.0</mysql-connector.version>
         <hikaricp.version>4.0.3</hikaricp.version>
         <validation.version>2.7.18</validation.version>
+        <jbcrypt.version>0.4</jbcrypt.version>
     </properties>
 
     <dependencyManagement>
@@ -91,6 +92,11 @@
                 <version>${redis.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
                 <version>${jedis.version}</version>
@@ -99,6 +105,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
                 <version>${redis-common-pool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mindrot</groupId>
+                <artifactId>jbcrypt</artifactId>
+                <version>${jbcrypt.version}</version>
             </dependency>
 
             <!--framework-项目依赖-->

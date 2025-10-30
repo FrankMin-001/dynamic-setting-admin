@@ -33,7 +33,7 @@ public class BlbbDictDataVO implements Serializable {
     @ApiModelProperty(value = "状态：0-禁用，1-启用", example = "1")
     private Integer status;
 
-    @ApiModelProperty(value = "扩展属性(JSON)", example = "{\\"color\\":\\"red\\"}")
+    @ApiModelProperty(value = "扩展属性(JSON)", example = "")
     private String extendProps;
 
     @ApiModelProperty(value = "创建人", example = "admin")

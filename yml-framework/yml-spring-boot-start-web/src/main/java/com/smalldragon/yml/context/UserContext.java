@@ -1,6 +1,7 @@
 package com.smalldragon.yml.context;
 
 import com.smalldragon.yml.context.dto.LoginDTO;
+import com.smalldragon.yml.exception.NotLoginException;
 
 /**
  * 用户上下文工具类，用于获取当前登录用户信息
@@ -8,61 +9,66 @@ import com.smalldragon.yml.context.dto.LoginDTO;
  */
 public class UserContext {
 
-    private static final ThreadLocal<LoginDTO> threadLocalCache = new ThreadLocal<>();
-
-
-    public static void setLoginUser(LoginDTO loginUser) {
-        threadLocalCache.set(loginUser);
-    }
-
+    private static final ThreadLocal<Object> threadLocalCache = new ThreadLocal<>();
 
     /**
-     * 获取当前登录用户的 LoginVO 对象
-     *
-     * @return 当前登录用户的 LoginVO 对象
-     * @throws RuntimeException 如果用户未登录或用户信息为空
+     * 设置当前用户
+     * @param currentUser 当前用户对象
      */
-    public static LoginDTO getLoginUser() {
-        // 先从ThreadLocal中获取
-        LoginDTO loginUser = threadLocalCache.get();
-        if (loginUser != null) {
-            return loginUser;
-        }
+    public static void setCurrentUser(Object currentUser) {
+        threadLocalCache.set(currentUser);
+    }
 
-        // 如果ThreadLocal中没有，则从Sa-Token的Session中获取
-        Object userInfo = StpUtil.getTokenSession().get("userInfo");
-        if (userInfo == null) {
-            throw new RuntimeException("用户未登录或用户信息为空");
+    /**
+     * 获取当前登录用户对象
+     * @return 当前登录用户对象
+     * @throws NotLoginException 如果用户未登录或用户信息为空
+     */
+    public static Object getCurrentUser() {
+        Object currentUser = threadLocalCache.get();
+        if (currentUser == null) {
+            throw new NotLoginException("用户未登录或用户信息为空");
         }
-
-        loginUser = (LoginDTO) userInfo;
-        // 将获取到的用户信息存入ThreadLocal，避免重复从Session中获取
-        threadLocalCache.set(loginUser);
-        return loginUser;
+        return currentUser;
     }
 
     /**
      * 获取当前登录用户的 ID
-     *
      * @return 当前登录用户的 ID
-     * @throws RuntimeException 如果用户未登录或用户信息为空
+     * @throws NotLoginException 如果用户未登录或用户信息为空
      */
-    public static String getLoginUserId() {
-        return getLoginUser().getId();
+    public static String getCurrentUserId() {
+        Object currentUser = getCurrentUser();
+        if (currentUser instanceof LoginDTO) {
+            return ((LoginDTO) currentUser).getId();
+        }
+        throw new NotLoginException("无法获取用户ID，用户对象类型不匹配");
     }
 
     /**
-     * 获取当前登录用户的用户名
-     *
+     * 获取登录用户名（兼容旧调用）
      * @return 当前登录用户的用户名
-     * @throws RuntimeException 如果用户未登录或用户信息为空
+     * @throws NotLoginException 如果用户未登录或用户信息为空
      */
     public static String getLoginUsername() {
-        return getLoginUser().getUsername();
+        Object currentUser = getCurrentUser();
+        if (currentUser instanceof LoginDTO) {
+            return ((LoginDTO) currentUser).getUsername();
+        }
+        throw new NotLoginException("无法获取用户名，用户对象类型不匹配");
     }
 
+    /**
+     * @deprecated 请使用getLoginUsername()替代
+     */
+    public static String getCurrentUsername() {
+        return getLoginUsername();
+    }
+
+    /**
+     * 清理缓存
+     */
     public static void clearCache() {
         threadLocalCache.remove();
     }
-
 }
