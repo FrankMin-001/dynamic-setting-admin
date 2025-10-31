@@ -50,7 +50,7 @@ public class AuthenticateInterceptor implements HandlerInterceptor {
         try {
             Object currentUser = session.getAttribute("currentUser");
             UserContext.setCurrentUser(currentUser);
-            log.debug("用户认证通过: {}, URI: {}", session.getAttribute("username"), requestURI);
+            log.debug("用户认证通过: {}, URI: {}", UserContext.getLoginUsername(), requestURI);
         } catch (Exception e) {
             log.error("设置用户上下文失败: {}", e.getMessage(), e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

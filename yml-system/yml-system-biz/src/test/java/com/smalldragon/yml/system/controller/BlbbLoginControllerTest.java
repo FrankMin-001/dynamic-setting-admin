@@ -3,9 +3,12 @@ package com.smalldragon.yml.system.controller;
 import com.smalldragon.yml.system.service.useraccount.BlbbUserAccountService;
 import com.smalldragon.yml.system.dal.useraccount.BlbbUserAccountDO;
 import com.smalldragon.yml.system.util.PasswordUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +20,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class BlbbLoginControllerTest {
 
     @Mock
@@ -37,71 +41,76 @@ class BlbbLoginControllerTest {
     @InjectMocks
     private BlbbLoginController blbbLoginController;
 
+    @BeforeEach
+    void setUp() {
+        // Mock setup can be done here if needed
+    }
+
     @Test
     void login_Success() {
-        // 模拟用户数据
+        // Mock user data
         BlbbUserAccountDO mockUser = new BlbbUserAccountDO();
         mockUser.setUsername("testuser");
-        mockUser.setPassword("$2a$10$N9qo8uLOickgx2ZMRZoMy..."); // 加密后的密码
+        mockUser.setPassword("$2a$10$N9qo8uLOickgx2ZMRZoMy..."); // Encrypted password
         
-        // 模拟服务层行为
+        // Mock service layer behavior
         when(blbbUserAccountService.getUserAccountByUsername("testuser")).thenReturn(mockUser);
         when(passwordUtil.matches(anyString(), anyString())).thenReturn(true);
         
-        // 执行测试
+        // Execute test
         ResponseEntity<?> response = blbbLoginController.login("testuser", "password", mockRequest);
         
-        // 验证结果
+        // Verify result
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("登录成功", response.getBody());
+        assertEquals("Login successful", response.getBody());
     }
 
     @Test
     void login_Failure_WrongPassword() {
-        // 模拟用户数据
+        // Mock user data
         BlbbUserAccountDO mockUser = new BlbbUserAccountDO();
         mockUser.setUsername("testuser");
         mockUser.setPassword("$2a$10$N9qo8uLOickgx2ZMRZoMy...");
         
-        // 模拟服务层行为
+        // Mock service layer behavior
         when(blbbUserAccountService.getUserAccountByUsername("testuser")).thenReturn(mockUser);
         when(passwordUtil.matches(anyString(), anyString())).thenReturn(false);
         
-        // 执行测试
+        // Execute test
         ResponseEntity<?> response = blbbLoginController.login("testuser", "wrongpassword", mockRequest);
         
-        // 验证结果
+        // Verify result
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("用户名或密码错误", response.getBody());
+        assertEquals("Username or password incorrect", response.getBody());
     }
 
     @Test
     void logout_Success() {
-        // 模拟session
+        // Mock session
         when(mockRequest.getSession(false)).thenReturn(mockSession);
         when(mockSession.getAttribute("username")).thenReturn("testuser");
         
-        // 执行测试
+        // Execute test
         ResponseEntity<?> response = blbbLoginController.logout(mockRequest);
         
-        // 验证结果
+        // Verify result
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("登出成功", response.getBody());
+        assertEquals("Logout successful", response.getBody());
         verify(mockSession).invalidate();
     }
 
     @Test
     void checkLoginStatus_LoggedIn() {
-        // 模拟已登录session
+        // Mock logged-in session
         when(mockRequest.getSession(false)).thenReturn(mockSession);
         when(mockSession.getAttribute("currentUser")).thenReturn(mockUser);
         when(mockUser.getUsername()).thenReturn("testuser");
         
-        // 执行测试
+        // Execute test
         ResponseEntity<?> response = blbbLoginController.checkLoginStatus(mockRequest);
         
-        // 验证结果
+        // Verify result
         assertEquals(200, response.getStatusCodeValue());
-        assertTrue(response.getBody().toString().contains("已登录"));
+        assertTrue(response.getBody().toString().contains("Logged in"));
     }
 }

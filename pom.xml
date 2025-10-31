@@ -111,6 +111,17 @@
                 <artifactId>jbcrypt</artifactId>
                 <version>${jbcrypt.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <!--logback 依赖-->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.2.12</version>
+            </dependency>
 
             <!--framework-项目依赖-->
             <dependency>

@@ -28,6 +28,12 @@
             <groupId>com.smalldragon.yml</groupId>
             <artifactId>yml-redisson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <!-- 不需要指定版本，继承自Spring Boot父项目 -->
+        </dependency>
     </dependencies>
 
 </project>
