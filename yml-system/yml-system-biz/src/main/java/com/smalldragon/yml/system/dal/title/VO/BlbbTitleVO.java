@@ -1,5 +1,6 @@
 package com.smalldragon.yml.system.dal.title.VO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,10 +17,10 @@ import java.time.LocalDateTime;
 public class BlbbTitleVO implements Serializable {
 
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "上下文ID", example = "100")
-    private Long contextId;
+    private String contextId;
 
     @ApiModelProperty(value = "标题名称", example = "Booking Classes")
     private String titleName;
@@ -34,9 +35,11 @@ public class BlbbTitleVO implements Serializable {
     private Long templateId;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime createdTime;
 
     @ApiModelProperty(value = "更新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime updatedTime;
 
 }

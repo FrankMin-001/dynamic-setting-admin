@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @Author YML
  * @Date 2025/1/15 12:35
@@ -21,7 +23,7 @@ public class BlbbVersionHistoryServiceImpl implements BlbbVersionHistoryService 
     private final BlbbVersionHistoryMapper blbbVersionHistoryMapper;
 
     @Override
-    public IPage<BlbbVersionHistoryDO> pageList(int pageNo, int pageSize, Long configDataId) {
+    public IPage<BlbbVersionHistoryDO> pageList(int pageNo, int pageSize, String configDataId) {
         Page<BlbbVersionHistoryDO> page = new Page<>(pageNo, pageSize);
         LambdaQueryWrapper<BlbbVersionHistoryDO> wrapper = new LambdaQueryWrapper<>();
         if (configDataId != null) {
@@ -32,8 +34,19 @@ public class BlbbVersionHistoryServiceImpl implements BlbbVersionHistoryService 
     }
 
     @Override
+    public IPage<BlbbVersionHistoryDO> pageListByConfigDataIds(int pageNo, int pageSize, List<String> configDataIds) {
+        Page<BlbbVersionHistoryDO> page = new Page<>(pageNo, pageSize);
+        LambdaQueryWrapper<BlbbVersionHistoryDO> wrapper = new LambdaQueryWrapper<>();
+        if (configDataIds != null && !configDataIds.isEmpty()) {
+            wrapper.in(BlbbVersionHistoryDO::getConfigDataId, configDataIds);
+        }
+        wrapper.orderByDesc(BlbbVersionHistoryDO::getOperatedTime);
+        return blbbVersionHistoryMapper.selectPage(page, wrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean record(Long configDataId, String oldVersion, String newVersion, String changeType, String changeDescription, String changeData, String operatedBy) {
+    public Boolean record(String configDataId, String oldVersion, String newVersion, String changeType, String changeDescription, String changeData, String operatedBy) {
         BlbbVersionHistoryDO history = new BlbbVersionHistoryDO();
         history.setConfigDataId(configDataId);
         history.setOldVersion(oldVersion);

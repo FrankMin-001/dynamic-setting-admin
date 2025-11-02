@@ -19,7 +19,7 @@ public class BlbbContextDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "父级上下文ID，用于构建层级结构", example = "0")
     private Long parentId;

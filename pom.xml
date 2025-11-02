@@ -24,9 +24,6 @@
         <rversion>1.0.0</rversion>
         <spring-boot.version>2.7.18</spring-boot.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
-        <redis.version>2.7.10</redis.version>
-        <jedis.version>3.10.0</jedis.version>
-        <redis-common-pool.version>2.11.1</redis-common-pool.version>
         <mybatis-plus-join.version>1.3.11</mybatis-plus-join.version>
         <lombok.version>1.18.36</lombok.version>
         <hutool.version>5.8.35</hutool.version>
@@ -35,6 +32,7 @@
         <hikaricp.version>4.0.3</hikaricp.version>
         <validation.version>2.7.18</validation.version>
         <jbcrypt.version>0.4</jbcrypt.version>
+        <sa-token.version>1.34.0</sa-token.version>
     </properties>
 
     <dependencyManagement>
@@ -65,6 +63,11 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-thymeleaf</artifactId>
+                <version>2.7.18</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
@@ -87,26 +90,6 @@
                 <version>${validation.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>${redis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session-data-redis</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>redis.clients</groupId>
-                <artifactId>jedis</artifactId>
-                <version>${jedis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-pool2</artifactId>
-                <version>${redis-common-pool.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.mindrot</groupId>
                 <artifactId>jbcrypt</artifactId>
                 <version>${jbcrypt.version}</version>
@@ -115,6 +98,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
+                <scope>test</scope>
             </dependency>
             <!--logback 依赖-->
             <dependency>
@@ -137,11 +121,6 @@
             <dependency>
                 <groupId>com.smalldragon.yml</groupId>
                 <artifactId>yml-mybatis-plus</artifactId>
-                <version>${rversion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.smalldragon.yml</groupId>
-                <artifactId>yml-redisson</artifactId>
                 <version>${rversion}</version>
             </dependency>
 

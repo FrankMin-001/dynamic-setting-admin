@@ -46,14 +46,14 @@ public class BlbbContextController {
     @ApiOperation("批量删除上下文")
     @DeleteMapping("deleteData")
     @ApiParam(name = "ids", value = "要删除的主键ID集合", required = true)
-    public CommonResult<Boolean> deleteData(@RequestBody List<Long> ids) {
+    public CommonResult<Boolean> deleteData(@RequestBody List<String> ids) {
         return CommonResult.ok(blbbContextService.deleteData(ids));
     }
 
     @ApiOperation("获取上下文信息")
     @GetMapping("getInfoById")
     @ApiParam(name = "id", value = "要查询的上下文ID", required = true)
-    public CommonResult<BlbbContextVO> getInfoById(@RequestParam("id") Long id) {
+    public CommonResult<BlbbContextVO> getInfoById(@RequestParam("id") String id) {
         return CommonResult.ok(blbbContextService.getInfoById(id));
     }
 

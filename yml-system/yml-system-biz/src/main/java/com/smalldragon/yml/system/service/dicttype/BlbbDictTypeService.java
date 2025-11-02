@@ -25,21 +25,21 @@ public interface BlbbDictTypeService {
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean updateData(Long id, BlbbDictTypeCreateDTO updateDTO);
+    Boolean updateData(String id, BlbbDictTypeCreateDTO updateDTO);
 
     /**
      * @Description 删除字典类型
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
     /**
      * @Description 获取字典类型信息
      * @Author YML
      * @Date 2025/1/15
      */
-    BlbbDictTypeVO getInfoById(Long id);
+    BlbbDictTypeVO getInfoById(String id);
 
     /**
      * @Description 字典类型分页查询
@@ -67,5 +67,5 @@ public interface BlbbDictTypeService {
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean toggleStatus(Long id, Integer status);
+    Boolean toggleStatus(String id, Integer status);
 }

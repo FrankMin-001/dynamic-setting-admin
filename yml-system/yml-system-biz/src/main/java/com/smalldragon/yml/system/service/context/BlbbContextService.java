@@ -33,14 +33,14 @@ public interface BlbbContextService {
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
     /**
      * @Description 获取上下文信息
      * @Author YML
      * @Date 2025/1/15
      */
-    BlbbContextVO getInfoById(Long id);
+    BlbbContextVO getInfoById(String id);
 
     /**
      * @Description 上下文分页查询

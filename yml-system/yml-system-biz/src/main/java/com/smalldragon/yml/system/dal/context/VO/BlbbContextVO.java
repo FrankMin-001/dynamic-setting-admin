@@ -1,5 +1,8 @@
 package com.smalldragon.yml.system.dal.context.VO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,9 +20,10 @@ import java.util.List;
 public class BlbbContextVO implements Serializable {
 
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "父级上下文ID", example = "0")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long parentId;
 
     @ApiModelProperty(value = "完整路径", example = "/admin/spend/air")
@@ -41,9 +45,11 @@ public class BlbbContextVO implements Serializable {
     private String createdBy;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime createdTime;
 
     @ApiModelProperty(value = "更新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime updatedTime;
 
     @ApiModelProperty(value = "子节点列表")

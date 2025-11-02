@@ -25,21 +25,21 @@ public interface BlbbUserAccountService {
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean updatePassword(Long id, String newPassword);
+    Boolean updatePassword(String id, String newPassword);
 
     /**
      * @Description 删除用户账号
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
     /**
      * @Description 获取用户账号信息
      * @Author YML
      * @Date 2025/1/15
      */
-    BlbbUserAccountVO getInfoById(Long id);
+    BlbbUserAccountVO getInfoById(String id);
 
     /**
      * @Description 用户账号分页查询

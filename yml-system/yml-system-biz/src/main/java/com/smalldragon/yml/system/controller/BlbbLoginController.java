@@ -55,16 +55,17 @@ public class BlbbLoginController {
             }
 
             // 登录成功，保存用户信息到 session
-            HttpSession session = request.getSession();
+            HttpSession session = request.getSession(true);
             LoginDTO loginDTO = BeanUtil.copyProperties(userAccount, LoginDTO.class);
             session.setAttribute("currentUser", loginDTO);
             session.setAttribute("userId", userAccount.getId());
             session.setAttribute("username", userAccount.getUsername());
 
             // 设置 session 过期时间（30分钟）
-            session.setMaxInactiveInterval(30 * 60);
+            session.setMaxInactiveInterval( 30 * 60);
 
-            log.info("用户登录成功: {}", username);
+            log.info("用户登录成功: {}, Session ID: {}, Session过期时间: {}秒",
+                    username, session.getId(), session.getMaxInactiveInterval());
             return ResponseEntity.ok().body("登录成功");
         } catch (Exception e) {
             log.error("登录失败: {}", e.getMessage(), e);

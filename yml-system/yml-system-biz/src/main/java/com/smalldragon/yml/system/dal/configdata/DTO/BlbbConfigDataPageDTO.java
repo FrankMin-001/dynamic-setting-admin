@@ -3,6 +3,7 @@ package com.smalldragon.yml.system.dal.configdata.DTO;
 import com.smalldragon.yml.pojo.QueryPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -11,10 +12,11 @@ import java.io.Serializable;
  * @Date 2025/1/15 10:55
  **/
 @Data
+@Accessors(chain = false)
 public class BlbbConfigDataPageDTO extends QueryPage implements Serializable {
 
-    @ApiModelProperty(value = "关键词搜索", example = "VIP")
-    private String keywords;
+    @ApiModelProperty(value = "关联的标题ID", example = "1")
+    private String titleId;
 
     @ApiModelProperty(value = "模版类型", example = "upgrade_rule")
     private String templateType;

@@ -1,5 +1,6 @@
 package com.smalldragon.yml.system.dal.useraccount.VO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,11 +17,12 @@ import java.time.LocalDateTime;
 public class BlbbUserAccountVO implements Serializable {
 
     @ApiModelProperty(value = "用户ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "用户名", example = "admin")
     private String username;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime createdTime;
 }

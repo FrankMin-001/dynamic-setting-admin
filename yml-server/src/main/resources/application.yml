@@ -6,8 +6,7 @@ spring:
     name: yml-server
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://123.207.11.78:30306/single-system?useSSL=false&serverTimezone=UTC
-    url: jdbc:mysql://localhost:3306/blbb_datasource?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://123.207.11.78:30306/blbb_datasource?useSSL=false&serverTimezone=UTC
     username: root
     password: root123456
     hikari:
@@ -19,39 +18,25 @@ spring:
       minimum-idle: 2 # 连接池最小线程
       keepaliveTime: 30000 # 每隔30秒检查空闲连接是否有效
 
-
-  # redis配置
-  redis:
-    # Redis数据库索引（默认为0）
-    database: 1
-    # Redis服务器地址
-    host: 123.207.11.78
-#    host: 192.168.145.100
-    # Redis服务器连接端口
-    port: 30379
-    # Redis服务器连接密码（默认为空）
-    password: 980804
-    # 连接超时时间(ms)
-    timeout: 100000
-    jedis:
-#    lettuce:
-      pool:
-        # 连接池最大连接数
-        max-active: 200
-        # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-wait: -1
-        # 连接池中的最大空闲连接
-        max-idle: 10
-        # 连接池中的最小空闲连接
-        min-idle: 1
-  
-  # Spring Session Redis 配置
+  # Spring Session 配置（使用默认内存存储）
   session:
-    store-type: redis
-    timeout: 7200 # Session 过期时间（秒），2小时
-    redis:
-      flush-mode: on_save
-      namespace: blbb:session
+    timeout: 1800 # Session 过期时间（秒），30分钟
+
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false # 禁用视图缓存，支持热刷新
+    encoding: UTF-8
+    mode: HTML
+    servlet:
+      content-type: text/html
+  devtools:
+    restart:
+      enabled: true # 启用自动重启
+      additional-paths: src/main/resources/templates # 监控Thymeleaf模板文件变化
+    livereload:
+      enabled: true # 启用LiveReload，浏览器自动刷新
 
 mybatis-plus:
   configuration:

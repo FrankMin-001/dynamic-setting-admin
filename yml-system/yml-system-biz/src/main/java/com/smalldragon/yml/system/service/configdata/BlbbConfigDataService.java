@@ -25,21 +25,21 @@ public interface BlbbConfigDataService {
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean updateData(Long id, String rowData, String changeDescription);
+    Boolean updateData(String id, String rowData, String changeDescription);
 
     /**
      * @Description 删除配置数据
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
     /**
      * @Description 获取配置数据信息
      * @Author YML
      * @Date 2025/1/15
      */
-    BlbbConfigDataVO getInfoById(Long id);
+    BlbbConfigDataVO getInfoById(String id);
 
     /**
      * @Description 配置数据分页查询
@@ -56,9 +56,16 @@ public interface BlbbConfigDataService {
     List<BlbbConfigDataVO> getConfigDataByTemplateType(String templateType);
 
     /**
+     * @Description 根据标题ID获取配置数据列表
+     * @Author YML
+     * @Date 2025/1/15
+     */
+    List<BlbbConfigDataVO> getConfigDataByTitleId(String titleId);
+
+    /**
      * @Description 激活/禁用配置数据
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean toggleActive(Long id, Boolean isActive);
+    Boolean toggleActive(String id, Boolean isActive);
 }

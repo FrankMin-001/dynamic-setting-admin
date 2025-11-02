@@ -19,7 +19,7 @@ public class BlbbDictDataDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "字典类型", example = "booking_class")
     private String dictType;

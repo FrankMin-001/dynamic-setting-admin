@@ -19,7 +19,7 @@ public class BlbbTemplateDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "模版类型", example = "upgrade_rule")
     private String templateType;

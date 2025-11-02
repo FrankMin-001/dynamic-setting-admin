@@ -38,21 +38,21 @@ public class BlbbUserAccountController {
     @ApiOperation("修改用户密码（BCrypt哈希加密）")
     @PostMapping("updatePassword")
     @ApiParam(name = "id", value = "用户账号ID", required = true)
-    public CommonResult<Boolean> updatePassword(@RequestParam("id") Long id, @RequestParam("newPassword") String newPassword) {
+    public CommonResult<Boolean> updatePassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword) {
         return CommonResult.ok(blbbUserAccountService.updatePassword(id, newPassword));
     }
 
     @ApiOperation("批量删除用户账号")
     @DeleteMapping("deleteData")
     @ApiParam(name = "ids", value = "要删除的主键ID集合", required = true)
-    public CommonResult<Boolean> deleteData(@RequestBody List<Long> ids) {
+    public CommonResult<Boolean> deleteData(@RequestBody List<String> ids) {
         return CommonResult.ok(blbbUserAccountService.deleteData(ids));
     }
 
     @ApiOperation("获取用户账号信息")
     @GetMapping("getInfoById")
     @ApiParam(name = "id", value = "要查询的用户账号ID", required = true)
-    public CommonResult<BlbbUserAccountVO> getInfoById(@RequestParam("id") Long id) {
+    public CommonResult<BlbbUserAccountVO> getInfoById(@RequestParam("id") String id) {
         return CommonResult.ok(blbbUserAccountService.getInfoById(id));
     }
 

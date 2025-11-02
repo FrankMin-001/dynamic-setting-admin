@@ -15,17 +15,17 @@ public interface BlbbDictDataService {
 
     Boolean insertData(BlbbDictDataCreateDTO createDTO);
 
-    Boolean updateData(Long id, BlbbDictDataCreateDTO updateDTO);
+    Boolean updateData(String id, BlbbDictDataCreateDTO updateDTO);
 
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
-    BlbbDictDataVO getInfoById(Long id);
+    BlbbDictDataVO getInfoById(String id);
 
     IPage<BlbbDictDataDO> pageList(BlbbDictDataPageDTO pageDTO);
 
     List<BlbbDictDataVO> listByDictType(String dictType);
 
-    Boolean toggleStatus(Long id, Integer status);
+    Boolean toggleStatus(String id, Integer status);
 }
 
 

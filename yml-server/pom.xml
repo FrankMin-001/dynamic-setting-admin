@@ -20,9 +20,22 @@
             <groupId>com.smalldragon.yml</groupId>
             <artifactId>yml-system-biz</artifactId>
         </dependency>
+        <!-- 直接引入 API，避免无效的 biz POM 影响传递依赖 -->
         <dependency>
             <groupId>com.smalldragon.yml</groupId>
-            <artifactId>yml-function-biz</artifactId>
+            <artifactId>yml-function-api</artifactId>
+        </dependency>
+        <!-- Thymeleaf 支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- Spring Boot DevTools for hot reload -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <version>${spring-boot.version}</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

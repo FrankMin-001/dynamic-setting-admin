@@ -16,10 +16,10 @@ public class BlbbContextUpdateDTO implements Serializable {
 
     @ApiModelProperty(value = "主键ID", example = "1", required = true)
     @NotNull(message = "ID不能为空!")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "父级上下文ID，用于构建层级结构", example = "0")
-    private Long parentId;
+    private String parentId;
 
     @ApiModelProperty(value = "完整路径，如：/admin/spend/air", example = "/admin/spend/air")
     @NotBlank(message = "上下文路径不能为空!")

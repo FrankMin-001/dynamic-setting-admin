@@ -16,7 +16,7 @@ public class BlbbTemplateUpdateDTO implements Serializable {
 
     @ApiModelProperty(value = "主键ID", example = "1", required = true)
     @NotNull(message = "ID不能为空!")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "模版类型", example = "upgrade_rule")
     @NotBlank(message = "模版类型不能为空!")

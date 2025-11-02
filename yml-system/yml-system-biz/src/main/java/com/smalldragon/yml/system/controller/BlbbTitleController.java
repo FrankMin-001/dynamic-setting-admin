@@ -46,14 +46,14 @@ public class BlbbTitleController {
     @ApiOperation("批量删除标题")
     @DeleteMapping("deleteData")
     @ApiParam(name = "ids", value = "要删除的主键ID集合", required = true)
-    public CommonResult<Boolean> deleteData(@RequestBody List<Long> ids) {
+    public CommonResult<Boolean> deleteData(@RequestBody List<String> ids) {
         return CommonResult.ok(blbbTitleService.deleteData(ids));
     }
 
     @ApiOperation("获取标题信息")
     @GetMapping("getInfoById")
     @ApiParam(name = "id", value = "要查询的标题ID", required = true)
-    public CommonResult<BlbbTitleVO> getInfoById(@RequestParam("id") Long id) {
+    public CommonResult<BlbbTitleVO> getInfoById(@RequestParam("id") String id) {
         return CommonResult.ok(blbbTitleService.getInfoById(id));
     }
 
@@ -67,7 +67,7 @@ public class BlbbTitleController {
     @ApiOperation("根据上下文查询标题列表")
     @GetMapping("listByContextId")
     @ApiParam(name = "contextId", value = "上下文ID", required = true)
-    public CommonResult<List<BlbbTitleVO>> listByContextId(@RequestParam("contextId") Long contextId) {
+    public CommonResult<List<BlbbTitleVO>> listByContextId(@RequestParam("contextId") String contextId) {
         return CommonResult.ok(blbbTitleService.listByContextId(contextId));
     }
 

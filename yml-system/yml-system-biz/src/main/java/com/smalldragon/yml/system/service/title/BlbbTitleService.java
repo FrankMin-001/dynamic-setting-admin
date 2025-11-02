@@ -18,13 +18,13 @@ public interface BlbbTitleService {
 
     Boolean updateData(BlbbTitleUpdateDTO updateDTO);
 
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
-    BlbbTitleVO getInfoById(Long id);
+    BlbbTitleVO getInfoById(String id);
 
     IPage<BlbbTitleDO> pageList(BlbbTitlePageDTO pageDTO);
 
-    List<BlbbTitleVO> listByContextId(Long contextId);
+    List<BlbbTitleVO> listByContextId(String contextId);
 
     BlbbTitleDO getByTitleKey(String titleKey);
 }

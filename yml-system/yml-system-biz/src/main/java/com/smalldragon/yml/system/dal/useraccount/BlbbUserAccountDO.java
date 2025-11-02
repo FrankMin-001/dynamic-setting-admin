@@ -19,7 +19,7 @@ public class BlbbUserAccountDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "用户ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "用户名", example = "admin")
     private String username;

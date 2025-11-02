@@ -20,7 +20,6 @@
         <module>yml-mybatis-plus</module>
         <module>yml-spring-boot-start-web</module>
         <module>yml-common</module>
-        <module>yml-redisson</module>
     </modules>
 
 </project>

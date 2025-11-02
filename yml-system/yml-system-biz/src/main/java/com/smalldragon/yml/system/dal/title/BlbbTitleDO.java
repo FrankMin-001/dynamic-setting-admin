@@ -19,10 +19,10 @@ public class BlbbTitleDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "上下文ID", example = "100")
-    private Long contextId;
+    private String contextId;
 
     @ApiModelProperty(value = "标题名称", example = "Booking Classes")
     private String titleName;
@@ -34,7 +34,7 @@ public class BlbbTitleDO implements Serializable {
     private Integer displayOrder;
 
     @ApiModelProperty(value = "模板ID", example = "10")
-    private Long templateId;
+    private String templateId;
 }
 
 

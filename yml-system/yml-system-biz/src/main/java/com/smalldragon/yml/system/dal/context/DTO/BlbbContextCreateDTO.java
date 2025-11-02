@@ -14,8 +14,8 @@ import java.io.Serializable;
 @Data
 public class BlbbContextCreateDTO implements Serializable {
 
-    @ApiModelProperty(value = "父级上下文ID，用于构建层级结构", example = "0", required = true)
-    private Long parentId;
+    @ApiModelProperty(value = "父级上下文ID，用于构建层级结构", example = "0")
+    private String parentId;
 
     @ApiModelProperty(value = "完整路径，如：/admin/spend/air", example = "/admin/spend/air", required = true)
     @NotBlank(message = "上下文路径不能为空!")

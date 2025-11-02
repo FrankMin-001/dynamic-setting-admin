@@ -61,7 +61,7 @@ public class BlbbDictTypeServiceImpl implements BlbbDictTypeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updateData(Long id, BlbbDictTypeCreateDTO updateDTO) {
+    public Boolean updateData(String id, BlbbDictTypeCreateDTO updateDTO) {
         BlbbDictTypeDO dictTypeDO = blbbDictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
             throw new RuntimeException("要修改的字典类型信息不存在!");
@@ -95,8 +95,8 @@ public class BlbbDictTypeServiceImpl implements BlbbDictTypeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteData(List<Long> ids) {
-        for (Long id : ids) {
+    public Boolean deleteData(List<String> ids) {
+        for (String id : ids) {
             BlbbDictTypeDO before = blbbDictTypeMapper.selectById(id);
             if (before != null) {
                 blbbDictHistoryService.record(
@@ -113,7 +113,7 @@ public class BlbbDictTypeServiceImpl implements BlbbDictTypeService {
     }
 
     @Override
-    public BlbbDictTypeVO getInfoById(Long id) {
+    public BlbbDictTypeVO getInfoById(String id) {
         BlbbDictTypeDO dictTypeDO = blbbDictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
             throw new RuntimeException("字典类型信息不存在!");
@@ -175,7 +175,7 @@ public class BlbbDictTypeServiceImpl implements BlbbDictTypeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean toggleStatus(Long id, Integer status) {
+    public Boolean toggleStatus(String id, Integer status) {
         BlbbDictTypeDO dictTypeDO = blbbDictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
             throw new RuntimeException("字典类型不存在!");

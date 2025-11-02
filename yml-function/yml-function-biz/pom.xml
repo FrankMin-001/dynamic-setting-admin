@@ -25,10 +25,6 @@
             <groupId>com.smalldragon.yml</groupId>
             <artifactId>yml-mybatis-plus</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.smalldragon.yml</groupId>
-            <artifactId>yml-redisson</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

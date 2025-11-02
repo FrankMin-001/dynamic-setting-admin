@@ -33,14 +33,14 @@ public interface BlbbTemplateService {
      * @Author YML
      * @Date 2025/1/15
      */
-    Boolean deleteData(List<Long> ids);
+    Boolean deleteData(List<String> ids);
 
     /**
      * @Description 获取模板信息
      * @Author YML
      * @Date 2025/1/15
      */
-    BlbbTemplateVO getInfoById(Long id);
+    BlbbTemplateVO getInfoById(String id);
 
     /**
      * @Description 模板分页查询

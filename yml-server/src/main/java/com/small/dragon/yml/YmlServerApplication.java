@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @MapperScan("com.smalldragon.yml.*.mapper")
-@SpringBootApplication(scanBasePackages = "com.smalldragon.yml")
+@SpringBootApplication(scanBasePackages = {"com.smalldragon.yml", "com.yml.server"})
 public class YmlServerApplication {
 
     public static void main(String[] args) {

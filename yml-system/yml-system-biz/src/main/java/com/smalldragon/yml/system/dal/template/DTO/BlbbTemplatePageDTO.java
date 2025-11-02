@@ -1,8 +1,8 @@
 package com.smalldragon.yml.system.dal.template.DTO;
 
 import com.smalldragon.yml.pojo.QueryPage;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -11,11 +11,6 @@ import java.io.Serializable;
  * @Date 2025/1/15 10:35
  **/
 @Data
+@Accessors(chain = false)
 public class BlbbTemplatePageDTO extends QueryPage implements Serializable {
-
-    @ApiModelProperty(value = "关键词搜索", example = "upgrade")
-    private String keywords;
-
-    @ApiModelProperty(value = "模版类型", example = "upgrade_rule")
-    private String templateType;
 }

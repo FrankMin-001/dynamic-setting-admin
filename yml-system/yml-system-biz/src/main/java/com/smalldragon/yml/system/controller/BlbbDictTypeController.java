@@ -38,21 +38,21 @@ public class BlbbDictTypeController {
     @ApiOperation("修改字典类型")
     @PostMapping("updateData")
     @ApiParam(name = "id", value = "字典类型ID", required = true)
-    public CommonResult<Boolean> updateData(@RequestParam("id") Long id, @RequestBody @Validated BlbbDictTypeCreateDTO updateDTO) {
+    public CommonResult<Boolean> updateData(@RequestParam("id") String id, @RequestBody @Validated BlbbDictTypeCreateDTO updateDTO) {
         return CommonResult.ok(blbbDictTypeService.updateData(id, updateDTO));
     }
 
     @ApiOperation("批量删除字典类型")
     @DeleteMapping("deleteData")
     @ApiParam(name = "ids", value = "要删除的主键ID集合", required = true)
-    public CommonResult<Boolean> deleteData(@RequestBody List<Long> ids) {
+    public CommonResult<Boolean> deleteData(@RequestBody List<String> ids) {
         return CommonResult.ok(blbbDictTypeService.deleteData(ids));
     }
 
     @ApiOperation("获取字典类型信息")
     @GetMapping("getInfoById")
     @ApiParam(name = "id", value = "要查询的字典类型ID", required = true)
-    public CommonResult<BlbbDictTypeVO> getInfoById(@RequestParam("id") Long id) {
+    public CommonResult<BlbbDictTypeVO> getInfoById(@RequestParam("id") String id) {
         return CommonResult.ok(blbbDictTypeService.getInfoById(id));
     }
 
@@ -79,7 +79,7 @@ public class BlbbDictTypeController {
     @ApiOperation("启用/禁用字典类型")
     @PostMapping("toggleStatus")
     @ApiParam(name = "id", value = "字典类型ID", required = true)
-    public CommonResult<Boolean> toggleStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status) {
+    public CommonResult<Boolean> toggleStatus(@RequestParam("id") String id, @RequestParam("status") Integer status) {
         return CommonResult.ok(blbbDictTypeService.toggleStatus(id, status));
     }
 }

@@ -46,14 +46,14 @@ public class BlbbTemplateController {
     @ApiOperation("批量删除模板")
     @DeleteMapping("deleteData")
     @ApiParam(name = "ids", value = "要删除的主键ID集合", required = true)
-    public CommonResult<Boolean> deleteData(@RequestBody List<Long> ids) {
+    public CommonResult<Boolean> deleteData(@RequestBody List<String> ids) {
         return CommonResult.ok(blbbTemplateService.deleteData(ids));
     }
 
     @ApiOperation("获取模板信息")
     @GetMapping("getInfoById")
     @ApiParam(name = "id", value = "要查询的模板ID", required = true)
-    public CommonResult<BlbbTemplateVO> getInfoById(@RequestParam("id") Long id) {
+    public CommonResult<BlbbTemplateVO> getInfoById(@RequestParam("id") String id) {
         return CommonResult.ok(blbbTemplateService.getInfoById(id));
     }
 

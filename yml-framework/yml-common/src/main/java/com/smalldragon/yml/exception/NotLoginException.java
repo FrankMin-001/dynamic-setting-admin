@@ -18,7 +18,7 @@ public class NotLoginException extends RuntimeException {
     }
 
     public NotLoginException() {
-        super("用户未登录，请先登录");
+        super("未登录或登录已过期");
         this.code = 401;
     }
 

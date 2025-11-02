@@ -38,7 +38,7 @@ public class BlbbConfigDataController {
     @ApiOperation("修改配置数据")
     @PostMapping("updateData")
     @ApiParam(name = "id", value = "配置数据ID", required = true)
-    public CommonResult<Boolean> updateData(@RequestParam("id") Long id,
+    public CommonResult<Boolean> updateData(@RequestParam("id") String id,
                                            @RequestParam("rowData") String rowData,
                                            @RequestParam(value = "changeDescription", required = false) String changeDescription) {
         return CommonResult.ok(blbbConfigDataService.updateData(id, rowData, changeDescription));
@@ -47,14 +47,14 @@ public class BlbbConfigDataController {
     @ApiOperation("批量删除配置数据")
     @DeleteMapping("deleteData")
     @ApiParam(name = "ids", value = "要删除的主键ID集合", required = true)
-    public CommonResult<Boolean> deleteData(@RequestBody List<Long> ids) {
+    public CommonResult<Boolean> deleteData(@RequestBody List<String> ids) {
         return CommonResult.ok(blbbConfigDataService.deleteData(ids));
     }
 
     @ApiOperation("获取配置数据信息")
     @GetMapping("getInfoById")
     @ApiParam(name = "id", value = "要查询的配置数据ID", required = true)
-    public CommonResult<BlbbConfigDataVO> getInfoById(@RequestParam("id") Long id) {
+    public CommonResult<BlbbConfigDataVO> getInfoById(@RequestParam("id") String id) {
         return CommonResult.ok(blbbConfigDataService.getInfoById(id));
     }
 
@@ -72,10 +72,17 @@ public class BlbbConfigDataController {
         return CommonResult.ok(blbbConfigDataService.getConfigDataByTemplateType(templateType));
     }
 
+    @ApiOperation("根据标题ID获取配置数据列表")
+    @GetMapping("getConfigDataByTitleId")
+    @ApiParam(name = "titleId", value = "标题ID", required = true)
+    public CommonResult<List<BlbbConfigDataVO>> getConfigDataByTitleId(@RequestParam("titleId") String titleId) {
+        return CommonResult.ok(blbbConfigDataService.getConfigDataByTitleId(titleId));
+    }
+
     @ApiOperation("激活/禁用配置数据")
     @PostMapping("toggleActive")
     @ApiParam(name = "id", value = "配置数据ID", required = true)
-    public CommonResult<Boolean> toggleActive(@RequestParam("id") Long id, @RequestParam("isActive") Boolean isActive) {
+    public CommonResult<Boolean> toggleActive(@RequestParam("id") String id, @RequestParam("isActive") Boolean isActive) {
         return CommonResult.ok(blbbConfigDataService.toggleActive(id, isActive));
     }
 }

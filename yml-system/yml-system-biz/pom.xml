@@ -20,13 +20,14 @@
             <groupId>com.smalldragon.yml</groupId>
             <artifactId>yml-spring-boot-start-web</artifactId>
         </dependency>
+        <!-- BCrypt 密码加密/匹配 -->
         <dependency>
-            <groupId>com.smalldragon.yml</groupId>
-            <artifactId>yml-mybatis-plus</artifactId>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
         </dependency>
         <dependency>
             <groupId>com.smalldragon.yml</groupId>
-            <artifactId>yml-redisson</artifactId>
+            <artifactId>yml-mybatis-plus</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

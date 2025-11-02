@@ -3,6 +3,7 @@ package com.smalldragon.yml.system.dal.dictdata.DTO;
 import com.smalldragon.yml.pojo.QueryPage;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -11,10 +12,8 @@ import java.io.Serializable;
  * @Date 2025/1/15 12:00
  **/
 @Data
+@Accessors(chain = false)
 public class BlbbDictDataPageDTO extends QueryPage implements Serializable {
-
-    @ApiModelProperty(value = "关键词搜索(编码/值)", example = "C")
-    private String keywords;
 
     @ApiModelProperty(value = "字典类型", example = "booking_class")
     private String dictType;

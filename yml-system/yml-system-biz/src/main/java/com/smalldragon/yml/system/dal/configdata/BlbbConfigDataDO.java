@@ -19,7 +19,10 @@ public class BlbbConfigDataDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
+
+    @ApiModelProperty(value = "关联的标题ID", example = "1")
+    private String titleId;
 
     @ApiModelProperty(value = "模版类型", example = "upgrade_rule")
     private String templateType;

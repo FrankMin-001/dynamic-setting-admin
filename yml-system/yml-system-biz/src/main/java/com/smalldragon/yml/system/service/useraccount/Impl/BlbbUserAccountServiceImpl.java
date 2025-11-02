@@ -53,7 +53,7 @@ public class BlbbUserAccountServiceImpl implements BlbbUserAccountService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updatePassword(Long id, String newPassword) {
+    public Boolean updatePassword(String id, String newPassword) {
         BlbbUserAccountDO userAccountDO = blbbUserAccountMapper.selectById(id);
         if (userAccountDO == null) {
             throw new RuntimeException("用户账号不存在!");
@@ -68,13 +68,13 @@ public class BlbbUserAccountServiceImpl implements BlbbUserAccountService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteData(List<Long> ids) {
+    public Boolean deleteData(List<String> ids) {
         blbbUserAccountMapper.deleteBatchIds(ids);
         return true;
     }
 
     @Override
-    public BlbbUserAccountVO getInfoById(Long id) {
+    public BlbbUserAccountVO getInfoById(String id) {
         BlbbUserAccountDO userAccountDO = blbbUserAccountMapper.selectById(id);
         if (userAccountDO == null) {
             throw new RuntimeException("用户账号不存在!");

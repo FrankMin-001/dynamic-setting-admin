@@ -64,7 +64,7 @@ public class BlbbDictDataServiceImpl implements BlbbDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updateData(Long id, BlbbDictDataCreateDTO updateDTO) {
+    public Boolean updateData(String id, BlbbDictDataCreateDTO updateDTO) {
         BlbbDictDataDO db = blbbDictDataMapper.selectById(id);
         if (db == null) {
             throw new RuntimeException("字典数据不存在!");
@@ -93,8 +93,8 @@ public class BlbbDictDataServiceImpl implements BlbbDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteData(List<Long> ids) {
-        for (Long id : ids) {
+    public Boolean deleteData(List<String> ids) {
+        for (String id : ids) {
             BlbbDictDataDO before = blbbDictDataMapper.selectById(id);
             if (before != null) {
                 blbbDictHistoryService.record(
@@ -111,7 +111,7 @@ public class BlbbDictDataServiceImpl implements BlbbDictDataService {
     }
 
     @Override
-    public BlbbDictDataVO getInfoById(Long id) {
+    public BlbbDictDataVO getInfoById(String id) {
         BlbbDictDataDO db = blbbDictDataMapper.selectById(id);
         if (db == null) {
             throw new RuntimeException("字典数据不存在!");
@@ -165,7 +165,7 @@ public class BlbbDictDataServiceImpl implements BlbbDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean toggleStatus(Long id, Integer status) {
+    public Boolean toggleStatus(String id, Integer status) {
         BlbbDictDataDO db = blbbDictDataMapper.selectById(id);
         if (db == null) {
             throw new RuntimeException("字典数据不存在!");

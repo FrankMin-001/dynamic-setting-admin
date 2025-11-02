@@ -14,6 +14,9 @@ import java.io.Serializable;
 @Data
 public class BlbbConfigDataCreateDTO implements Serializable {
 
+    @ApiModelProperty(value = "关联的标题ID", example = "1")
+    private String titleId;
+
     @ApiModelProperty(value = "模版类型", example = "upgrade_rule", required = true)
     @NotBlank(message = "模版类型不能为空!")
     private String templateType;

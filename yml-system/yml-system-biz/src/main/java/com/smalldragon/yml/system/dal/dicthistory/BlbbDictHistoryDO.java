@@ -2,11 +2,13 @@ package com.smalldragon.yml.system.dal.dicthistory;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @Author YML
@@ -19,7 +21,7 @@ public class BlbbDictHistoryDO implements Serializable {
 
     @TableId
     @ApiModelProperty(value = "主键ID", example = "1")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "字典类型", example = "booking_class")
     private String dictType;
@@ -35,6 +37,10 @@ public class BlbbDictHistoryDO implements Serializable {
 
     @ApiModelProperty(value = "操作人", example = "admin")
     private String operatedBy;
+
+    @ApiModelProperty(value = "操作时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDateTime operatedTime;
 }
 
 

@@ -20,7 +20,14 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 认证拦截器 - 最高优先级，负责登录验证
         registry.addInterceptor(authenticateInterceptor)
-                .addPathPatterns("**")
-                .excludePathPatterns("/api/blbb/auth/**", "/swagger/**", "/webjars/**", "/v2/api-docs", "/doc.html");
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                    "/api/blbb/auth/**",        // 登录相关API接口
+                    "/blbb/login",              // 登录页面（不需要登录）
+                    "/swagger/**",              // Swagger文档
+                    "/webjars/**",              // WebJars静态资源
+                    "/v2/api-docs",             // API文档
+                    "/doc.html"                 // API文档页面
+                );
     }
 }

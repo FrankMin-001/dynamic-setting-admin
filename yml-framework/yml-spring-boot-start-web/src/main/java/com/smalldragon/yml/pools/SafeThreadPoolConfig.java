@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,12 +29,15 @@ public class SafeThreadPoolConfig {
     private String threadNamePrefix;
 
     /**
-     * 符合阿里巴巴规范的安全线程池
+     * 符合阿里巴巴规范的安全线程池（全局默认线程池）
      * 1. 不使用Executors创建
      * 2. 使用有界队列
      * 3. 明确拒绝策略
+     * 
+     * @Primary 注解使其成为默认的全局线程池，可直接注入使用，无需指定 @Qualifier
      */
     @Bean("CommonThreadPool")
+    @Primary
     public ThreadPoolExecutor safeThreadPool() {
         // 创建有界队列
         BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(queueCapacity);

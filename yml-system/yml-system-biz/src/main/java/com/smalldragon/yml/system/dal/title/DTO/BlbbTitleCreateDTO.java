@@ -16,7 +16,7 @@ public class BlbbTitleCreateDTO implements Serializable {
 
     @ApiModelProperty(value = "上下文ID", example = "100", required = true)
     @NotNull(message = "上下文ID不能为空!")
-    private Long contextId;
+    private String contextId;
 
     @ApiModelProperty(value = "标题名称", example = "Booking Classes", required = true)
     @NotBlank(message = "标题名称不能为空!")

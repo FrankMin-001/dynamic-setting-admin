@@ -2,6 +2,8 @@ package com.smalldragon.yml.system.service.template.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -96,13 +98,13 @@ public class BlbbTemplateServiceImpl implements BlbbTemplateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteData(List<Long> ids) {
+    public Boolean deleteData(List<String> ids) {
         blbbTemplateMapper.deleteBatchIds(ids);
         return true;
     }
 
     @Override
-    public BlbbTemplateVO getInfoById(Long id) {
+    public BlbbTemplateVO getInfoById(String id) {
         BlbbTemplateDO templateDO = blbbTemplateMapper.selectById(id);
         if (templateDO == null) {
             throw new RuntimeException("模板信息不存在!");
@@ -116,17 +118,19 @@ public class BlbbTemplateServiceImpl implements BlbbTemplateService {
         LambdaQueryWrapper<BlbbTemplateDO> queryWrapper = new LambdaQueryWrapper<>();
 
         if (StrUtil.isNotBlank(pageDTO.getKeywords())) {
-            queryWrapper.like(BlbbTemplateDO::getTemplateType, pageDTO.getKeywords())
+            // 忽略大小写搜索模板类型和模板名称
+            queryWrapper.and(wrapper -> wrapper
+                    .apply("UPPER(template_type) LIKE UPPER({0})", "%" + pageDTO.getKeywords() + "%")
                     .or()
-                    .like(BlbbTemplateDO::getTemplateName, pageDTO.getKeywords());
-        }
-
-        if (StrUtil.isNotBlank(pageDTO.getTemplateType())) {
-            queryWrapper.eq(BlbbTemplateDO::getTemplateType, pageDTO.getTemplateType());
+                    .apply("UPPER(template_name) LIKE UPPER({0})", "%" + pageDTO.getKeywords() + "%"));
         }
 
         queryWrapper.orderByDesc(BlbbTemplateDO::getId);
-        return blbbTemplateMapper.selectPage(page, queryWrapper);
+	    Page<BlbbTemplateDO> blbbTemplateDOPage = blbbTemplateMapper.selectPage(page, queryWrapper);
+	    for (BlbbTemplateDO record : blbbTemplateDOPage.getRecords()) {
+		    log.info(JSONUtil.toJsonStr(record));
+	    }
+	    return blbbTemplateDOPage;
     }
 
     @Override
