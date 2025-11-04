@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据字典 - BLBB Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --sidebar-bg: #1a1d29;
+            --card-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 32px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 40px;
+        }
+        
+        .nav-item {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .username {
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            min-width: 120px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f7fafc;
+        }
+        
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-enabled {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-disabled {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #f7fafc;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination .page-info {
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: #f7fafc;
+            color: var(--text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="/js/global-error-handler.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>BLBB Editor</h1>
+                    <div class="subtitle">数据字典管理系统</div>
+                </div>
+                <div class="header-nav">
+                    <a href="/blbb/editor" class="nav-item" id="navEditor">配置管理</a>
+                    <a href="/blbb/dict" class="nav-item active" id="navDict">数据字典</a>
+                    <a href="/blbb/template" class="nav-item" id="navTemplate">模版管理</a>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar" th:text="${username != null and !#strings.isEmpty(username) ? #strings.toUpperCase(#strings.substring(username, 0, 1)) : 'U'}">
+                            U
+                        </div>
+                        <span class="username" th:text="${username != null and !#strings.isEmpty(username) ? username : '未登录'}">未登录</span>
+                    </div>
+                    <button th:if="${username != null and !#strings.isEmpty(username)}" 
+                            class="btn-logout" 
+                            id="logoutBtn">登出</button>
+                    <button th:unless="${username != null and !#strings.isEmpty(username)}" 
+                            class="btn-logout" 
+                            onclick="window.location.href='/blbb/login'">登录</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" data-tab="dictType">字典类型</button>
+                <button class="tab" data-tab="dictData">字典数据</button>
+                <button class="tab" data-tab="history">历史记录</button>
+            </div>
+            
+            <!-- 字典类型管理 -->
+            <div class="tab-content active" id="dictTypeTab">
+                <div class="toolbar">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label>状态:</label>
+                            <select class="filter-select" id="dictTypeStatusFilter">
+                                <option value="">全部</option>
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="loadDictTypes()">查询</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="showDictTypeModal()">+ 新增字典类型</button>
+                </div>
+                <div class="table-container">
+                    <table id="dictTypeTable">
+                        <thead>
+                            <tr>
+                                <th width="60"><input type="checkbox" id="dictTypeSelectAll"></th>
+                                <th>字典类型</th>
+                                <th>字典名称</th>
+                                <th>描述</th>
+                                <th width="100">状态</th>
+                                <th>创建人</th>
+                                <th width="200">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dictTypeTableBody">
+                            <tr>
+                                <td colspan="7" class="loading">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="dictTypePagination"></div>
+            </div>
+            
+            <!-- 字典数据管理 -->
+            <div class="tab-content" id="dictDataTab">
+                <div class="toolbar">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label>字典类型:</label>
+                            <select class="filter-select" id="dictDataTypeFilter">
+                                <option value="">全部</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>状态:</label>
+                            <select class="filter-select" id="dictDataStatusFilter">
+                                <option value="">全部</option>
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="loadDictData()">查询</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="showDictDataModal()">+ 新增字典数据</button>
+                </div>
+                <div class="table-container">
+                    <table id="dictDataTable">
+                        <thead>
+                            <tr>
+                                <th width="60"><input type="checkbox" id="dictDataSelectAll"></th>
+                                <th>字典类型</th>
+                                <th>字典编码</th>
+                                <th>字典值</th>
+                                <th>显示顺序</th>
+                                <th width="100">状态</th>
+                                <th>创建人</th>
+                                <th width="200">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dictDataTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="dictDataPagination"></div>
+            </div>
+            
+            <!-- 历史记录 -->
+            <div class="tab-content" id="historyTab">
+                <div class="toolbar">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label>字典类型:</label>
+                            <input type="text" class="filter-input" id="historyDictTypeFilter" placeholder="输入字典类型">
+                        </div>
+                        <button class="btn btn-secondary" onclick="loadHistory()">查询</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>字典类型</th>
+                                <th>操作类型</th>
+                                <th>操作人</th>
+                                <th>操作时间</th>
+                                <th width="150">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="5" class="loading">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="historyPagination"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 字典类型模态框 -->
+    <div class="modal" id="dictTypeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="dictTypeModalTitle">新增字典类型</h2>
+                <button class="modal-close" onclick="closeDictTypeModal()">&times;</button>
+            </div>
+            <form id="dictTypeForm">
+                <input type="hidden" id="dictTypeId">
+                <div class="form-group">
+                    <label>字典类型 <span style="color: red;">*</span></label>
+                    <input type="text" id="dictTypeType" required placeholder="如：booking_class">
+                </div>
+                <div class="form-group">
+                    <label>字典名称 <span style="color: red;">*</span></label>
+                    <input type="text" id="dictTypeName" required placeholder="如：预订舱位类型">
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea id="dictTypeDescription" placeholder="字典描述信息"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>状态 <span style="color: red;">*</span></label>
+                    <select id="dictTypeStatus" required>
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeDictTypeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 字典数据模态框 -->
+    <div class="modal" id="dictDataModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="dictDataModalTitle">新增字典数据</h2>
+                <button class="modal-close" onclick="closeDictDataModal()">&times;</button>
+            </div>
+            <form id="dictDataForm">
+                <input type="hidden" id="dictDataId">
+                <div class="form-group">
+                    <label>字典类型 <span style="color: red;">*</span></label>
+                    <select id="dictDataType" required>
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>字典编码 <span style="color: red;">*</span></label>
+                    <input type="text" id="dictDataCode" required placeholder="如：C">
+                </div>
+                <div class="form-group">
+                    <label>字典值 <span style="color: red;">*</span></label>
+                    <input type="text" id="dictDataValue" required placeholder="如：C舱">
+                </div>
+                <div class="form-group">
+                    <label>显示顺序</label>
+                    <input type="number" id="dictDataOrder" placeholder="10" value="0">
+                </div>
+                <div class="form-group">
+                    <label>扩展属性(JSON)</label>
+                    <textarea id="dictDataExtend" placeholder='{"key": "value"}'></textarea>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="dictDataStatus">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeDictDataModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 历史详情模态框 -->
+    <div class="modal" id="historyDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>历史记录详情</h2>
+                <button class="modal-close" onclick="closeHistoryDetailModal()">&times;</button>
+            </div>
+            <div id="historyDetailContent" style="white-space: pre-wrap; font-family: monospace; background: #f7fafc; padding: 16px; border-radius: 8px; max-height: 500px; overflow-y: auto;"></div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeHistoryDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let currentDictTypePage = 1;
+        let currentDictDataPage = 1;
+        let currentHistoryPage = 1;
+        const pageSize = 10;
+        
+        // 初始化
+        $(document).ready(function() {
+            // Tab切换
+            $('.tab').on('click', function() {
+                const tabId = $(this).data('tab');
+                $('.tab').removeClass('active');
+                $(this).addClass('active');
+                $('.tab-content').removeClass('active');
+                $(`#${tabId}Tab`).addClass('active');
+                
+                // 加载对应tab的数据
+                if (tabId === 'dictType') {
+                    loadDictTypes();
+                } else if (tabId === 'dictData') {
+                    loadEnabledDictTypes();
+                    loadDictData();
+                } else if (tabId === 'history') {
+                    loadHistory();
+                }
+            });
+            
+            // 加载初始数据
+            loadDictTypes();
+            
+            // 表单提交
+            $('#dictTypeForm').on('submit', function(e) {
+                e.preventDefault();
+                saveDictType();
+            });
+            
+            $('#dictDataForm').on('submit', function(e) {
+                e.preventDefault();
+                saveDictData();
+            });
+            
+            // 全选功能
+            $('#dictTypeSelectAll').on('change', function() {
+                $('#dictTypeTableBody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+            });
+            
+            $('#dictDataSelectAll').on('change', function() {
+                $('#dictDataTableBody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+            });
+            
+            // 登出功能
+            $('#logoutBtn').on('click', function() {
+                if (confirm('确定要登出吗？')) {
+                    $.ajax({
+                        url: '/api/blbb/auth/logout',
+                        type: 'POST',
+                        success: function() {
+                            window.location.href = '/blbb/login';
+                        },
+                        error: function() {
+                            alert('登出失败，请重试');
+                        }
+                    });
+                }
+            });
+        });
+        
+        // 字典类型管理
+        function loadDictTypes(page = 1) {
+            currentDictTypePage = page;
+            const status = $('#dictTypeStatusFilter').val();
+            
+            $.ajax({
+                url: '/system/dictType/pageList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    pageNo: page,
+                    pageSize: pageSize,
+                    status: status || undefined
+                }),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        renderDictTypes(result.data);
+                        renderPagination('dictTypePagination', result.data, loadDictTypes);
+                    } else {
+                        alert('加载失败: ' + result.msg);
+                    }
+                },
+                error: function() {
+                    $('#dictTypeTableBody').html('<tr><td colspan="7" class="empty-state">加载失败，请重试</td></tr>');
+                }
+            });
+        }
+        
+        function renderDictTypes(pageData) {
+            const tbody = $('#dictTypeTableBody');
+            if (!pageData.records || pageData.records.length === 0) {
+                tbody.html('<tr><td colspan="7" class="empty-state">暂无数据</td></tr>');
+                return;
+            }
+            
+            let html = '';
+            pageData.records.forEach(item => {
+                html += `
+                    <tr>
+                        <td><input type="checkbox" value="${item.id}"></td>
+                        <td>${escapeHtml(item.dictType)}</td>
+                        <td>${escapeHtml(item.dictName)}</td>
+                        <td>${escapeHtml(item.description || '')}</td>
+                        <td><span class="status-badge ${item.status === 1 ? 'status-enabled' : 'status-disabled'}">${item.status === 1 ? '启用' : '禁用'}</span></td>
+                        <td>${escapeHtml(item.createdBy || '')}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-icon btn-primary" onclick="editDictType('${item.id}')">编辑</button>
+                                <button class="btn btn-icon ${item.status === 1 ? 'btn-warning' : 'btn-success'}" onclick="toggleDictTypeStatus('${item.id}', ${item.status === 1 ? 0 : 1})">${item.status === 1 ? '禁用' : '启用'}</button>
+                                <button class="btn btn-icon btn-danger" onclick="deleteDictType('${item.id}')">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.html(html);
+        }
+        
+        function showDictTypeModal(id = null) {
+            $('#dictTypeForm')[0].reset();
+            $('#dictTypeId').val('');
+            $('#dictTypeModalTitle').text(id ? '编辑字典类型' : '新增字典类型');
+            
+            if (id) {
+                $.ajax({
+                    url: '/system/dictType/getInfoById?id=' + id,
+                    type: 'GET',
+                    success: function(result) {
+                        if (result.code === 2000) {
+                            const data = result.data;
+                            $('#dictTypeId').val(data.id);
+                            $('#dictTypeType').val(data.dictType);
+                            $('#dictTypeName').val(data.dictName);
+                            $('#dictTypeDescription').val(data.description || '');
+                            $('#dictTypeStatus').val(data.status);
+                            $('#dictTypeType').prop('readonly', true); // 编辑时不允许修改字典类型
+                        }
+                    }
+                });
+            } else {
+                $('#dictTypeType').prop('readonly', false);
+            }
+            
+            $('#dictTypeModal').addClass('active');
+        }
+        
+        function closeDictTypeModal() {
+            $('#dictTypeModal').removeClass('active');
+        }
+        
+        function saveDictType() {
+            const id = $('#dictTypeId').val();
+            const data = {
+                dictType: $('#dictTypeType').val(),
+                dictName: $('#dictTypeName').val(),
+                description: $('#dictTypeDescription').val(),
+                status: parseInt($('#dictTypeStatus').val())
+            };
+            
+            const url = id ? `/system/dictType/updateData?id=${id}` : '/system/dictType/insertData';
+            const method = 'POST';
+            
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert(id ? '更新成功' : '创建成功');
+                        closeDictTypeModal();
+                        loadDictTypes(currentDictTypePage);
+                        loadEnabledDictTypes(); // 刷新字典类型下拉框
+                    } else {
+                        alert('操作失败: ' + result.msg);
+                    }
+                },
+                error: function(xhr) {
+                    alert('操作失败: ' + (xhr.responseJSON?.msg || '未知错误'));
+                }
+            });
+        }
+        
+        function editDictType(id) {
+            showDictTypeModal(id);
+        }
+        
+        function toggleDictTypeStatus(id, status) {
+            $.ajax({
+                url: `/system/dictType/toggleStatus?id=${id}&status=${status}`,
+                type: 'POST',
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert('操作成功');
+                        loadDictTypes(currentDictTypePage);
+                        loadEnabledDictTypes(); // 刷新字典类型下拉框
+                    } else {
+                        alert('操作失败: ' + result.msg);
+                    }
+                }
+            });
+        }
+        
+        function deleteDictType(id) {
+            if (!confirm('确定要删除这条字典类型吗？删除后相关的字典数据也会被删除！')) {
+                return;
+            }
+            
+            $.ajax({
+                url: '/system/dictType/deleteData',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify([id]),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert('删除成功');
+                        loadDictTypes(currentDictTypePage);
+                        loadEnabledDictTypes(); // 刷新字典类型下拉框
+                    } else {
+                        alert('删除失败: ' + result.msg);
+                    }
+                }
+            });
+        }
+        
+        // 字典数据管理
+        function loadEnabledDictTypes() {
+            $.ajax({
+                url: '/system/dictType/getAllEnabledDictTypes',
+                type: 'GET',
+                success: function(result) {
+                    if (result.code === 2000) {
+                        const select = $('#dictDataTypeFilter, #dictDataType');
+                        const currentValue = select.val();
+                        select.empty();
+                        select.append('<option value="">全部</option>');
+                        result.data.forEach(item => {
+                            select.append(`<option value="${item.dictType}">${item.dictName} (${item.dictType})</option>`);
+                        });
+                        if (currentValue) {
+                            select.val(currentValue);
+                        }
+                    }
+                }
+            });
+        }
+        
+        function loadDictData(page = 1) {
+            currentDictDataPage = page;
+            const dictType = $('#dictDataTypeFilter').val();
+            const status = $('#dictDataStatusFilter').val();
+            
+            $.ajax({
+                url: '/system/dictData/pageList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    pageNo: page,
+                    pageSize: pageSize,
+                    dictType: dictType || undefined,
+                    status: status || undefined
+                }),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        renderDictData(result.data);
+                        renderPagination('dictDataPagination', result.data, loadDictData);
+                    } else {
+                        alert('加载失败: ' + result.msg);
+                    }
+                },
+                error: function() {
+                    $('#dictDataTableBody').html('<tr><td colspan="8" class="empty-state">加载失败，请重试</td></tr>');
+                }
+            });
+        }
+        
+        function renderDictData(pageData) {
+            const tbody = $('#dictDataTableBody');
+            if (!pageData.records || pageData.records.length === 0) {
+                tbody.html('<tr><td colspan="8" class="empty-state">暂无数据</td></tr>');
+                return;
+            }
+            
+            let html = '';
+            pageData.records.forEach(item => {
+                html += `
+                    <tr>
+                        <td><input type="checkbox" value="${item.id}"></td>
+                        <td>${escapeHtml(item.dictType)}</td>
+                        <td>${escapeHtml(item.dictCode)}</td>
+                        <td>${escapeHtml(item.dictValue)}</td>
+                        <td>${item.displayOrder || 0}</td>
+                        <td><span class="status-badge ${item.status === 1 ? 'status-enabled' : 'status-disabled'}">${item.status === 1 ? '启用' : '禁用'}</span></td>
+                        <td>${escapeHtml(item.createdBy || '')}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-icon btn-primary" onclick="editDictData('${item.id}')">编辑</button>
+                                <button class="btn btn-icon ${item.status === 1 ? 'btn-warning' : 'btn-success'}" onclick="toggleDictDataStatus('${item.id}', ${item.status === 1 ? 0 : 1})">${item.status === 1 ? '禁用' : '启用'}</button>
+                                <button class="btn btn-icon btn-danger" onclick="deleteDictData('${item.id}')">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.html(html);
+        }
+        
+        function showDictDataModal(id = null) {
+            $('#dictDataForm')[0].reset();
+            $('#dictDataId').val('');
+            $('#dictDataModalTitle').text(id ? '编辑字典数据' : '新增字典数据');
+            
+            // 加载启用的字典类型
+            loadEnabledDictTypes();
+            
+            if (id) {
+                $.ajax({
+                    url: '/system/dictData/getInfoById?id=' + id,
+                    type: 'GET',
+                    success: function(result) {
+                        if (result.code === 2000) {
+                            const data = result.data;
+                            $('#dictDataId').val(data.id);
+                            $('#dictDataType').val(data.dictType);
+                            $('#dictDataCode').val(data.dictCode);
+                            $('#dictDataValue').val(data.dictValue);
+                            $('#dictDataOrder').val(data.displayOrder || 0);
+                            $('#dictDataExtend').val(data.extendProps || '');
+                            $('#dictDataStatus').val(data.status || 1);
+                            $('#dictDataType').prop('disabled', true); // 编辑时不允许修改字典类型
+                            $('#dictDataCode').prop('readonly', true); // 编辑时不允许修改编码
+                        }
+                    }
+                });
+            } else {
+                $('#dictDataType').prop('disabled', false);
+                $('#dictDataCode').prop('readonly', false);
+            }
+            
+            $('#dictDataModal').addClass('active');
+        }
+        
+        function closeDictDataModal() {
+            $('#dictDataModal').removeClass('active');
+            $('#dictDataType').prop('disabled', false);
+            $('#dictDataCode').prop('readonly', false);
+        }
+        
+        function saveDictData() {
+            const id = $('#dictDataId').val();
+            const data = {
+                dictType: $('#dictDataType').val(),
+                dictCode: $('#dictDataCode').val(),
+                dictValue: $('#dictDataValue').val(),
+                displayOrder: parseInt($('#dictDataOrder').val() || 0),
+                extendProps: $('#dictDataExtend').val() || null,
+                status: parseInt($('#dictDataStatus').val() || 1)
+            };
+            
+            const url = id ? `/system/dictData/updateData?id=${id}` : '/system/dictData/insertData';
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert(id ? '更新成功' : '创建成功');
+                        closeDictDataModal();
+                        loadDictData(currentDictDataPage);
+                    } else {
+                        alert('操作失败: ' + result.msg);
+                    }
+                },
+                error: function(xhr) {
+                    alert('操作失败: ' + (xhr.responseJSON?.msg || '未知错误'));
+                }
+            });
+        }
+        
+        function editDictData(id) {
+            showDictDataModal(id);
+        }
+        
+        function toggleDictDataStatus(id, status) {
+            $.ajax({
+                url: `/system/dictData/toggleStatus?id=${id}&status=${status}`,
+                type: 'POST',
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert('操作成功');
+                        loadDictData(currentDictDataPage);
+                    } else {
+                        alert('操作失败: ' + result.msg);
+                    }
+                }
+            });
+        }
+        
+        function deleteDictData(id) {
+            if (!confirm('确定要删除这条字典数据吗？')) {
+                return;
+            }
+            
+            $.ajax({
+                url: '/system/dictData/deleteData',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify([id]),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert('删除成功');
+                        loadDictData(currentDictDataPage);
+                    } else {
+                        alert('删除失败: ' + result.msg);
+                    }
+                }
+            });
+        }
+        
+        // 历史记录管理
+        function loadHistory(page = 1) {
+            currentHistoryPage = page;
+            const dictType = $('#historyDictTypeFilter').val();
+            
+            $.ajax({
+                url: '/system/dictHistory/pageList',
+                type: 'GET',
+                data: {
+                    pageNo: page,
+                    pageSize: pageSize,
+                    dictType: dictType || undefined
+                },
+                success: function(result) {
+                    if (result.code === 2000) {
+                        renderHistory(result.data);
+                        renderPagination('historyPagination', result.data, loadHistory);
+                    } else {
+                        alert('加载失败: ' + result.msg);
+                    }
+                },
+                error: function() {
+                    $('#historyTableBody').html('<tr><td colspan="5" class="empty-state">加载失败，请重试</td></tr>');
+                }
+            });
+        }
+        
+        function renderHistory(pageData) {
+            const tbody = $('#historyTableBody');
+            if (!pageData.records || pageData.records.length === 0) {
+                tbody.html('<tr><td colspan="5" class="empty-state">暂无数据</td></tr>');
+                return;
+            }
+            
+            let html = '';
+            pageData.records.forEach(item => {
+                const operationText = item.operationType === 'ADD' ? '新增' : 
+                                     item.operationType === 'UPDATE' ? '修改' : '删除';
+                const operationColor = item.operationType === 'ADD' ? 'status-enabled' : 
+                                      item.operationType === 'UPDATE' ? 'status-disabled' : 'btn-danger';
+                
+                html += `
+                    <tr data-history-id="${item.id}">
+                        <td>${escapeHtml(item.dictType)}</td>
+                        <td><span class="status-badge ${operationColor}">${operationText}</span></td>
+                        <td>${escapeHtml(item.operatedBy || '')}</td>
+                        <td>${formatDateTime(item.operatedTime || '')}</td>
+                        <td>
+                            <button class="btn btn-icon btn-primary" onclick="showHistoryDetailById('${item.id}')">查看详情</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.html(html);
+            
+            // 存储数据到DOM以便后续使用
+            pageData.records.forEach((item, index) => {
+                const row = tbody.find(`tr[data-history-id="${item.id}"]`);
+                row.data('history', item);
+            });
+        }
+        
+        function showHistoryDetailById(id) {
+            // 从DOM中获取存储的数据
+            const row = $(`#historyTableBody tr[data-history-id="${id}"]`);
+            const historyData = row.data('history');
+            
+            if (historyData) {
+                displayHistoryDetail(historyData);
+                $('#historyDetailModal').addClass('active');
+            } else {
+                // 如果没找到，重新查询
+                $('#historyDetailContent').text('加载中...');
+                $('#historyDetailModal').addClass('active');
+                
+                const dictType = $('#historyDictTypeFilter').val();
+                $.ajax({
+                    url: '/system/dictHistory/pageList',
+                    type: 'GET',
+                    data: {
+                        pageNo: 1,
+                        pageSize: 1000,
+                        dictType: dictType || undefined
+                    },
+                    success: function(result) {
+                        if (result.code === 2000 && result.data.records) {
+                            const record = result.data.records.find(r => r.id === id);
+                            if (record) {
+                                displayHistoryDetail(record);
+                            } else {
+                                $('#historyDetailContent').text('未找到相关数据');
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function displayHistoryDetail(record) {
+            let content = '操作类型: ' + (record.operationType === 'ADD' ? '新增' : 
+                         record.operationType === 'UPDATE' ? '修改' : '删除') + '\n';
+            content += '字典类型: ' + (record.dictType || '') + '\n';
+            content += '操作人: ' + (record.operatedBy || '') + '\n\n';
+            content += '旧数据:\n';
+            try {
+                const oldData = JSON.parse(record.oldData || '{}');
+                content += JSON.stringify(oldData, null, 2);
+            } catch(e) {
+                content += record.oldData || '(无)';
+            }
+            content += '\n\n新数据:\n';
+            try {
+                const newData = JSON.parse(record.newData || '{}');
+                content += JSON.stringify(newData, null, 2);
+            } catch(e) {
+                content += record.newData || '(无)';
+            }
+            
+            $('#historyDetailContent').text(content);
+        }
+        
+        function closeHistoryDetailModal() {
+            $('#historyDetailModal').removeClass('active');
+        }
+        
+        // 工具函数
+        function renderPagination(id, pageData, callback) {
+            const pagination = $('#' + id);
+            const totalPages = pageData.pages || 1;
+            const currentPage = pageData.current || 1;
+            
+            if (totalPages <= 1) {
+                pagination.html('');
+                return;
+            }
+            
+            let html = `
+                <button onclick="${callback.name}(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${currentPage} / ${totalPages} 页，共 ${pageData.total || 0} 条</span>
+                <button onclick="${callback.name}(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>下一页</button>
+            `;
+            pagination.html(html);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        function formatDateTime(dateTime) {
+            if (!dateTime) return '';
+            // 如果已经是 yyyy-MM-dd 格式，直接返回
+            if (typeof dateTime === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateTime)) {
+                return dateTime;
+            }
+            // 如果是完整日期时间字符串，提取日期部分
+            if (typeof dateTime === 'string' && dateTime.includes('T')) {
+                return dateTime.split('T')[0];
+            }
+            // 如果是Date对象或时间戳，格式化为 yyyy-MM-dd
+            const d = new Date(dateTime);
+            if (isNaN(d.getTime())) {
+                return '';
+            }
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    </script>
+</body>
+</html>

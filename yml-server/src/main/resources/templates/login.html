@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>BLBB动态配置管理系统 - 登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --dark: #1a202c;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --error: #ef4444;
+            --success: #22c55e;
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        /* 背景装饰 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            pointer-events: none;
+        }
+        
+        .login-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-bg {
+            flex: 1;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 0 60px;
+        }
+        
+        .login-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .login-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .bg-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 550px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .bg-logo {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bg-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        
+        .bg-desc {
+            font-size: 16px;
+            line-height: 1.8;
+            opacity: 0.95;
+            margin-bottom: 48px;
+            font-weight: 400;
+        }
+        
+        .bg-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 40px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px 24px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .feature:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        .feature-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .login-form-container {
+            width: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 64px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+            animation: fadeInRight 0.6s ease-out;
+        }
+        
+        .form-header {
+            margin-bottom: 40px;
+        }
+        
+        .form-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        .form-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+        
+        .form-input-wrapper {
+            position: relative;
+        }
+        
+        .form-input {
+            width: 100%;
+            height: 52px;
+            padding: 0 20px 0 48px;
+            font-size: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: #f8f9fb;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        
+        .login-btn {
+            height: 52px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            letter-spacing: 0.5px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .msg {
+            margin-top: 16px;
+            font-size: 14px;
+            min-height: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .msg.ok {
+            color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+        
+        .msg.err {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .form-footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .form-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .form-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .login-bg {
+                flex: 0.7;
+                padding: 0 40px;
+            }
+            
+            .bg-logo {
+                font-size: 48px;
+            }
+            
+            .bg-title {
+                font-size: 30px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .login-container {
+                flex-direction: column;
+            }
+            
+            .login-bg {
+                display: none;
+            }
+            
+            .login-form-container {
+                width: 100%;
+                height: 100%;
+                box-shadow: none;
+                padding: 40px;
+                background: rgba(255, 255, 255, 0.98);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .login-form-container {
+                padding: 32px 24px;
+            }
+            
+            .form-title {
+                font-size: 28px;
+            }
+            
+            .bg-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script>
+        const api = {
+            login: '/api/blbb/auth/login',
+            status: '/api/blbb/auth/status'
+        };
+
+        function checkLogin() {
+            $.get(api.status).done(function(res){
+                if (typeof res === 'string' && res.startsWith('已登录')) {
+                    window.location.href = '/blbb/editor';
+                }
+            });
+        }
+
+        function doLogin() {
+            const $btn = $('#btnLogin');
+            const username = $('#username').val().trim();
+            const password = $('#password').val();
+            $('#msg').removeClass('ok err').text('');
+            if (!username || !password) {
+                $('#msg').addClass('err').text('请输入用户名和密码');
+                return;
+            }
+            $btn.prop('disabled', true).text('登录中...');
+            $.post(api.login, { username, password })
+                .done(function(){
+                    $('#msg').addClass('ok').text('登录成功，正在跳转...');
+                    setTimeout(function(){ window.location.href = '/blbb/editor'; }, 500);
+                })
+                .fail(function(xhr){
+                    const t = xhr.responseText || '登录失败';
+                    $('#msg').addClass('err').text(t);
+                })
+                .always(function(){ $btn.prop('disabled', false).text('登录'); });
+        }
+
+        $(function(){
+            checkLogin();
+            $('#btnLogin').on('click', doLogin);
+            $('#password').on('keypress', function(e){ if (e.key === 'Enter') doLogin(); });
+        });
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <!-- 左侧背景区域 -->
+        <div class="login-bg">
+            <div class="bg-content">
+                <div class="bg-logo">BLBB</div>
+                <h1 class="bg-title">动态配置管理系统</h1>
+                <p class="bg-desc">高效、安全、可靠的企业级配置管理平台，为您的业务提供强大的配置支持和灵活的管理能力。</p>
+                
+                <div class="bg-features">
+                    <div class="feature">
+                        <span class="feature-icon">🛡️</span>
+                        <div class="feature-text">安全可靠的配置管理</div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">⚙️</span>
+                        <div class="feature-text">灵活的动态配置</div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📈</span>
+                        <div class="feature-text">高效的性能表现</div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📝</span>
+                        <div class="feature-text">完整的版本控制</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧登录表单 -->
+        <div class="login-form-container">
+            <div class="form-header">
+                <h2 class="form-title">欢迎登录</h2>
+                <p class="form-subtitle">请使用您的账号密码登录系统</p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="username">用户名</label>
+                <div class="form-input-wrapper">
+                    <span class="form-input-icon">👤</span>
+                    <input id="username" class="form-input" type="text" placeholder="请输入用户名" autocomplete="username" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password">密码</label>
+                <div class="form-input-wrapper">
+                    <span class="form-input-icon">🔒</span>
+                    <input id="password" class="form-input" type="password" placeholder="请输入密码" autocomplete="current-password" />
+                </div>
+            </div>
+            
+            <button id="btnLogin" class="login-btn">登录</button>
+            <div id="msg" class="msg"></div>
+            
+            <div class="form-footer">
+                登录成功后将跳转到 <a class="form-link" href="/blbb/editor">编辑器</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

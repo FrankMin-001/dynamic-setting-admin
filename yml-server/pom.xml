@@ -37,11 +37,16 @@
             <version>${spring-boot.version}</version>
             <optional>true</optional>
         </dependency>
+        <!--
+            war 包部署说明：
+            - 如果要用 java -jar 运行（Docker/K8s 推荐），保持默认配置（内嵌 Tomcat）
+            - 如果要部署到外部 Tomcat，将 spring-boot-starter-tomcat 改为 provided scope
+        -->
     </dependencies>
 
     <build>
-        <!-- 设置构建的 jar 包名 -->
-        <finalName>${project.artifactId}</finalName>
+        <!-- 设置构建的 war 包名 -->
+        <finalName>dragon-dynamic-setting</finalName>
         <plugins>
             <!-- 打包 -->
             <plugin>

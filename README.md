@@ -2,6 +2,77 @@
 
 简介: 此项目基于静态配置繁琐,想要把一系列规则变成线上动态的配置管理后台,因为是我自己设计的,所以就这个名字了;
 
+## 部署与启动说明
+
+本项目为 Spring Boot 应用，推荐以 Docker 镜像在 K3s 集群中部署。以下为从源码到部署的完整流程与依赖说明。
+
+### 运行环境依赖
+- Java `17`
+- Maven `3.8+`
+- Docker（可用来本地构建镜像与导出 tar）
+- K3s 集群及 `kubectl`
+- K3s 节点安装的 `nerdctl` 或 `ctr`（用于导入本地镜像 tar）
+- MySQL 数据库（默认库名：`blbb_datasource`）
+
+### 构建应用与镜像
+1. 在项目根目录打包：
+   - `mvn clean package -DskipTests`
+   - 应用主 JAR 输出：`yml-server/target/dragon-dynamic-setting.jar`
+2. 构建 Docker 镜像（镜像名与标签）：
+   - `docker build -t dragon-dynamic-setting:20251103 .`
+3. 导出镜像为 tar（便于在 K3s 节点导入）：
+   - `docker save -o dragon-dynamic-setting_20251103.tar dragon-dynamic-setting:20251103`
+
+### 导入镜像到 K3s 节点
+将 `dragon-dynamic-setting_20251103.tar` 拷贝到 K3s 主节点，任选其一导入：
+- 使用 `nerdctl`：
+  - `nerdctl --namespace k8s.io load -i dragon-dynamic-setting_20251103.tar`
+- 使用 `ctr`：
+  - `ctr -n k8s.io images import dragon-dynamic-setting_20251103.tar`
+
+导入后可验证镜像：
+- `nerdctl --namespace k8s.io images | grep dragon-dynamic-setting`
+
+### 数据库配置
+部署清单中通过环境变量配置数据库连接（可按需改为 ConfigMap/Secret）：
+- `SPRING_DATASOURCE_URL`（示例：`jdbc:mysql://mysql-service.infra-dev.svc.cluster.local:3306/blbb_datasource?useSSL=false&serverTimezone=UTC&characterEncoding=utf8`）
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+
+如需直接使用外部数据库，可将 URL 改为外网地址（示例：`jdbc:mysql://<db-host>:<port>/blbb_datasource?...`）。
+
+### K3s 部署
+已在根目录提供 `Dragon-DynamicSettingAdmin.yaml` 清单，命名空间为 `infra-dev`，NodePort 为 `30082`，容器端口为 `8080`，内存限制为 `128Mi`。直接执行：
+- `kubectl apply -f Dragon-DynamicSettingAdmin.yaml -n infra-dev`
+
+部署要点：
+- 应用端口：`8080`（Service 将 NodePort 映射到 `30082`）
+- JVM 内存限制通过 `JAVA_OPTS`：`-Xms64m -Xmx128m -XX:MaxMetaspaceSize=64m`
+- 容器资源限制：`limits.memory=128Mi`，与 JVM 堆配置匹配，避免 OOM
+- 就绪/存活探针：`/blbb/login`（可根据实际页面与接口调整）
+
+访问方式：
+- `http://<NodeIP>:30082/` 或 `http://<NodeIP>:30082/blbb/login`
+
+### 前端依赖与构建
+- 前端采用 Spring Boot 的 `Thymeleaf` 模板与静态资源，随 JAR 一并打包，无需额外在集群中执行 `npm install`。
+- 模板路径：`yml-server/src/main/resources/templates`；静态资源路径：`yml-server/src/main/resources/static`。
+- 本地开发时已启用 `spring-boot-devtools`：修改模板或静态资源会触发自动重启/热加载，无需单独前端构建流程。
+- 根目录下 `package.json` 仅用于开发脚本（如 `scripts/` 下工具），与后端运行无关；如需使用这些脚本：
+  - `npm ci`（推荐）或 `npm install`
+  - 推荐 Node 版本：`>=18`
+  - 运行示例：`node scripts/list-databases.js`
+
+### 本地运行（不使用容器）
+直接运行 JAR 并配置数据库：
+- `java -Xms64m -Xmx128m -XX:MaxMetaspaceSize=64m -jar yml-server/target/dragon-dynamic-setting.jar --server.port=8080 --spring.datasource.url="jdbc:mysql://<db-host>:<port>/blbb_datasource?useSSL=false&serverTimezone=UTC" --spring.datasource.username=<username> --spring.datasource.password=<password>`
+
+### 常见问题排查
+- 端口不通：确认 NodePort `30082` 未被占用，且 Service/Deployment 端口为 `8080`
+- 数据库连通性：K3s 节点是否能访问数据库地址；账号密码是否正确
+- 内存限制：确认容器限制为 `128Mi`，JVM 堆为 `-Xmx128m`
+- 镜像拉取策略：本地导入镜像时建议 `imagePullPolicy=IfNotPresent`
+
 ## 使用方式
 
 暂定好要配置的模版路径,以及模版内的动态配置规则以及sheet页

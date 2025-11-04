@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模版管理 - BLBB Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --sidebar-bg: #1a1d29;
+            --card-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 32px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 40px;
+        }
+        
+        .nav-item {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .username {
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f7fafc;
+        }
+        
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #f7fafc;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination .page-info {
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: #f7fafc;
+            color: var(--text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .json-preview {
+            max-width: 100%;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: #f7fafc;
+            padding: 8px;
+            border-radius: 4px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .columns-container {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            max-height: 500px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .columns-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .columns-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .columns-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .columns-container::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        .columns-container::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        .column-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: grid;
+            grid-template-columns: 1.2fr 1.2fr 1fr 1.3fr 1fr auto;
+            gap: 16px;
+            align-items: start;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .column-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .column-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-gradient);
+            border-radius: 12px 0 0 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .column-item:hover::before {
+            opacity: 1;
+        }
+        
+        .column-dict-config {
+            position: relative;
+        }
+        
+        .column-dict-config .data-source-select {
+            width: 100%;
+        }
+        
+        .column-dict-config.enabled .data-source-select {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        @media (max-width: 1200px) {
+            .column-item {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            
+            .column-delete-btn {
+                grid-column: 1 / -1;
+                padding-top: 0;
+                margin-top: 8px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .column-item {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .column-delete-btn {
+                grid-column: 1;
+                padding-top: 0;
+            }
+        }
+        
+        .column-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .column-item .form-group {
+            margin-bottom: 0;
+        }
+        
+        .column-item .form-group label {
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .column-item .form-group label span {
+            color: #f56565;
+            font-weight: bold;
+        }
+        
+        .column-item .form-group input,
+        .column-item .form-group select {
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .column-item .form-group input:focus,
+        .column-item .form-group select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        .column-delete-btn {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding-top: 28px;
+            gap: 8px;
+        }
+        
+        .column-delete-btn button {
+            min-width: auto;
+            padding: 8px 16px;
+        }
+        
+        .btn-move-up {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .btn-move-up:hover:not(:disabled) {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+        
+        .btn-move-up:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #cbd5e0;
+        }
+        
+        .btn-icon-small {
+            padding: 10px 16px;
+            font-size: 13px;
+            min-width: auto;
+            white-space: nowrap;
+            border-radius: 8px;
+        }
+        
+        .btn-add-column {
+            width: 100%;
+            margin-top: 16px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-add-column:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-add-column::before {
+            content: '+';
+            font-size: 20px;
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+        
+        .empty-columns {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        
+        .empty-columns::before {
+            content: '📋';
+            display: block;
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        
+        .column-item-header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .column-item-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .column-item-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+            flex: 1;
+            margin-left: 12px;
+        }
+        
+        .modal-content {
+            max-width: 900px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="/js/global-error-handler.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>BLBB Editor</h1>
+                    <div class="subtitle">模版管理系统</div>
+                </div>
+                <div class="header-nav">
+                    <a href="/blbb/editor" class="nav-item" id="navEditor">配置管理</a>
+                    <a href="/blbb/dict" class="nav-item" id="navDict">数据字典</a>
+                    <a href="/blbb/template" class="nav-item active" id="navTemplate">模版管理</a>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar" th:text="${username != null and !#strings.isEmpty(username) ? #strings.toUpperCase(#strings.substring(username, 0, 1)) : 'U'}">
+                            U
+                        </div>
+                        <span class="username" th:text="${username != null and !#strings.isEmpty(username) ? username : '未登录'}">未登录</span>
+                    </div>
+                    <button th:if="${username != null and !#strings.isEmpty(username)}" 
+                            class="btn-logout" 
+                            id="logoutBtn">登出</button>
+                    <button th:unless="${username != null and !#strings.isEmpty(username)}" 
+                            class="btn-logout" 
+                            onclick="window.location.href='/blbb/login'">登录</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="toolbar">
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>模版类型:</label>
+                        <input type="text" class="filter-input" id="templateTypeFilter" placeholder="输入模版类型">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadTemplates()">查询</button>
+                </div>
+                <button class="btn btn-primary" onclick="showTemplateModal()">+ 新增模版</button>
+            </div>
+            <div class="table-container">
+                <table id="templateTable">
+                    <thead>
+                        <tr>
+                            <th width="60"><input type="checkbox" id="templateSelectAll"></th>
+                            <th>模版类型</th>
+                            <th>模版名称</th>
+                            <th>列定义</th>
+                            <th width="200">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="templateTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="templatePagination"></div>
+        </div>
+    </div>
+    
+    <!-- 模版模态框 -->
+    <div class="modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="templateModalTitle">新增模版</h2>
+                <button class="modal-close" onclick="closeTemplateModal()">&times;</button>
+            </div>
+            <form id="templateForm">
+                <input type="hidden" id="templateId">
+                <div class="form-group">
+                    <label>模版类型 <span style="color: red;">*</span></label>
+                    <input type="text" id="templateType" required placeholder="如：upgrade_rule">
+                </div>
+                <div class="form-group">
+                    <label>模版名称 <span style="color: red;">*</span></label>
+                    <input type="text" id="templateName" required placeholder="如：升级规则模版">
+                </div>
+                <div class="form-group">
+                    <label>列定义 <span style="color: red;">*</span></label>
+                    <div class="columns-container" id="columnsContainer">
+                        <div class="empty-columns" id="emptyColumnsHint">暂无列定义，请点击"添加列"按钮添加</div>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-add-column" onclick="addColumn()">
+                        + 添加列
+                    </button>
+                    <small style="color: var(--text-secondary); margin-top: 8px; display: block;">
+                        提示：至少添加一个列定义。保存时会自动转换为JSON格式存储。
+                    </small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeTemplateModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let currentTemplatePage = 1;
+        const pageSize = 10;
+        
+        // 初始化
+        $(document).ready(function() {
+            // 预加载字典类型列表
+            loadDictTypes();
+            // 加载初始数据
+            loadTemplates();
+            
+            // 表单提交
+            $('#templateForm').on('submit', function(e) {
+                e.preventDefault();
+                saveTemplate();
+            });
+            
+            // 全选功能
+            $('#templateSelectAll').on('change', function() {
+                $('#templateTableBody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+            });
+            
+            // 登出功能
+            $('#logoutBtn').on('click', function() {
+                if (confirm('确定要登出吗？')) {
+                    $.ajax({
+                        url: '/api/blbb/auth/logout',
+                        type: 'POST',
+                        success: function() {
+                            window.location.href = '/blbb/login';
+                        },
+                        error: function() {
+                            alert('登出失败，请重试');
+                        }
+                    });
+                }
+            });
+        });
+        
+        // 模版管理
+        function loadTemplates(page = 1) {
+            currentTemplatePage = page;
+            const templateType = $('#templateTypeFilter').val();
+            
+            $.ajax({
+                url: '/system/template/pageList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    pageNo: page,
+                    pageSize: pageSize,
+                    templateType: templateType || undefined
+                }),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        renderTemplates(result.data);
+                        renderPagination('templatePagination', result.data, loadTemplates);
+                    } else {
+                        alert('加载失败: ' + result.msg);
+                    }
+                },
+                error: function() {
+                    $('#templateTableBody').html('<tr><td colspan="5" class="empty-state">加载失败，请重试</td></tr>');
+                }
+            });
+        }
+        
+        function renderTemplates(pageData) {
+            const tbody = $('#templateTableBody');
+            if (!pageData.records || pageData.records.length === 0) {
+                tbody.html('<tr><td colspan="5" class="empty-state">暂无数据</td></tr>');
+                return;
+            }
+            
+            let html = '';
+            pageData.records.forEach(item => {
+                let columnDefPreview = item.columnDefinitions || '';
+                if (columnDefPreview.length > 100) {
+                    columnDefPreview = columnDefPreview.substring(0, 100) + '...';
+                }
+                
+                html += `
+                    <tr>
+                        <td><input type="checkbox" value="${item.id}"></td>
+                        <td>${escapeHtml(item.templateType)}</td>
+                        <td>${escapeHtml(item.templateName)}</td>
+                        <td>
+                            <div class="json-preview" title="${escapeHtml(item.columnDefinitions || '')}">${escapeHtml(columnDefPreview)}</div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-icon btn-primary" onclick="editTemplate('${item.id}')">编辑</button>
+                                <button class="btn btn-icon btn-danger" onclick="deleteTemplate('${item.id}')">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.html(html);
+        }
+        
+        // 列定义管理
+        let columnIndex = 0;
+        
+        // 缓存字典类型列表
+        let dictTypeList = [];
+        
+        // 加载字典类型列表
+        function loadDictTypes() {
+            if (dictTypeList.length > 0) {
+                return Promise.resolve(dictTypeList);
+            }
+            
+            return $.ajax({
+                url: '/system/dictType/getAllEnabledDictTypes',
+                method: 'GET',
+                dataType: 'json'
+            }).then(function(res) {
+                if (res.code === 2000 && res.data) {
+                    dictTypeList = res.data || [];
+                    return dictTypeList;
+                }
+                return [];
+            }).fail(function() {
+                console.warn('加载字典类型失败');
+                return [];
+            });
+        }
+        
+        function addColumn(columnData = null) {
+            const container = $('#columnsContainer');
+            $('#emptyColumnsHint').remove();
+            
+            const index = columnIndex++;
+            const column = columnData || { 
+                name: '', 
+                label: '', 
+                required: false,
+                useDict: false,
+                dictType: ''
+            };
+            
+            // 安全地转义值
+            const name = escapeHtml(column.name || '');
+            const label = escapeHtml(column.label || '');
+            const useDict = column.useDict === true || column.useDict === 'true';
+            const dictType = column.dictType || '';
+            
+            // 构建包含"手动录入"选项的字典类型列表（内部函数，用于初始化）
+            function buildDictTypeOptionsWithManualForInit(selectedDictType = '') {
+                let options = '<option value="manual">手动录入</option>';
+                if (dictTypeList.length > 0) {
+                    dictTypeList.forEach(dt => {
+                        const selected = dt.dictType === selectedDictType ? 'selected' : '';
+                        const displayName = dt.dictName ? `${dt.dictName} (${dt.dictType})` : dt.dictType;
+                        options += `<option value="${escapeHtml(dt.dictType)}" ${selected}>${escapeHtml(displayName)}</option>`;
+                    });
+                }
+                return options;
+            }
+            
+            const columnNumber = index + 1;
+            const dataSourceValue = useDict ? 'dict' : 'manual';
+            const requiredValue = column.required ? 'yes' : 'no';
+            
+            // 根据是否使用字典构建不同的选项
+            let dataSourceOptions;
+            if (useDict) {
+                // 如果使用了字典，显示字典类型列表（包含手动录入选项）
+                dataSourceOptions = buildDictTypeOptionsWithManualForInit(dictType);
+            } else {
+                // 如果未使用字典，显示数据源选择选项
+                dataSourceOptions = `
+                    <option value="manual" ${dataSourceValue === 'manual' ? 'selected' : ''}>手动录入</option>
+                    <option value="dict" ${dataSourceValue === 'dict' ? 'selected' : ''}>数据字典</option>
+                `;
+            }
+            
+            const columnHtml = `
+                <div class="column-item" data-column-index="${index}">
+                    <div class="form-group">
+                        <label>列名 <span>*</span></label>
+                        <input type="text" class="column-name" value="${name}" 
+                               placeholder="如：permission_code" required>
+                    </div>
+                    <div class="form-group">
+                        <label>显示标签 <span>*</span></label>
+                        <input type="text" class="column-label" value="${label}" 
+                               placeholder="如：权限代码" required>
+                    </div>
+                    <div class="form-group column-dict-config ${useDict ? 'enabled' : ''}">
+                        <label>数据配置 <span>*</span></label>
+                        <select class="column-data-source data-source-select" 
+                                data-mode="${useDict ? 'dict' : 'source'}"
+                                data-dict-type="${dictType || ''}"
+                                onchange="handleDataSourceChange(${index}, this)">
+                            ${dataSourceOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>是否必填 <span>*</span></label>
+                        <select class="column-required">
+                            <option value="no" ${requiredValue === 'no' ? 'selected' : ''}>否</option>
+                            <option value="yes" ${requiredValue === 'yes' ? 'selected' : ''}>是</option>
+                        </select>
+                    </div>
+                    <div class="column-delete-btn">
+                        <button type="button" class="btn btn-move-up btn-icon-small" onclick="moveColumnUp(${index})" title="上移">↑</button>
+                        <button type="button" class="btn btn-danger btn-icon-small" onclick="removeColumn(${index})">删除</button>
+                    </div>
+                </div>
+            `;
+            
+            container.append(columnHtml);
+            updateEmptyHint();
+            updateMoveUpButtons();
+            
+            // 如果字典类型列表为空，且选择了数据字典，加载字典类型
+            if (useDict && dictTypeList.length === 0) {
+                loadDictTypes().then(function() {
+                    const $columnItem = $(`.column-item[data-column-index="${index}"]`);
+                    const $dataSource = $columnItem.find('.column-data-source');
+                    if ($dataSource.length > 0 && $dataSource.data('mode') === 'dict') {
+                        let newOptions = buildDictTypeOptionsWithManual(dictType);
+                        $dataSource.html(newOptions);
+                        if (dictType) {
+                            $dataSource.val(dictType);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 构建包含"手动录入"选项的字典类型列表
+        function buildDictTypeOptionsWithManual(selectedDictType = '') {
+            let options = '<option value="manual">手动录入</option>';
+            if (dictTypeList.length > 0) {
+                dictTypeList.forEach(dt => {
+                    const selected = dt.dictType === selectedDictType ? 'selected' : '';
+                    const displayName = dt.dictName ? `${dt.dictName} (${dt.dictType})` : dt.dictType;
+                    options += `<option value="${escapeHtml(dt.dictType)}" ${selected}>${escapeHtml(displayName)}</option>`;
+                });
+            }
+            return options;
+        }
+        
+        // 处理数据配置下拉框的变化
+        function handleDataSourceChange(index, selectElement) {
+            const $select = $(selectElement);
+            const $columnItem = $(`.column-item[data-column-index="${index}"]`);
+            const $dictConfig = $columnItem.find('.column-dict-config');
+            const currentMode = $select.data('mode');
+            const selectedValue = $select.val();
+            
+            if (currentMode === 'source') {
+                // 当前是数据源选择模式
+                if (selectedValue === 'dict') {
+                    // 切换到字典类型选择模式
+                    if (dictTypeList.length === 0) {
+                        // 如果字典类型未加载，先加载
+                        loadDictTypes().then(function() {
+                            switchToDictMode(index, $select, '');
+                        });
+                    } else {
+                        switchToDictMode(index, $select, '');
+                    }
+                }
+                // 如果选择"手动录入"，保持当前模式
+            } else {
+                // 当前是字典类型选择模式
+                if (selectedValue === 'manual') {
+                    // 切换回数据源选择模式
+                    switchToSourceMode(index, $select);
+                } else {
+                    // 选择了字典类型，保存选择并保持在字典选择模式
+                    $select.data('dict-type', selectedValue);
+                    $dictConfig.addClass('enabled');
+                }
+            }
+        }
+        
+        // 切换到字典类型选择模式
+        function switchToDictMode(index, $select, selectedDictType) {
+            const options = buildDictTypeOptionsWithManual(selectedDictType);
+            $select.html(options);
+            $select.data('mode', 'dict');
+            if (selectedDictType) {
+                $select.val(selectedDictType);
+                const $columnItem = $(`.column-item[data-column-index="${index}"]`);
+                const $dictConfig = $columnItem.find('.column-dict-config');
+                $dictConfig.addClass('enabled');
+            } else {
+                // 如果没有预设字典类型，不选中任何项，让用户主动选择
+                $select.val('');
+            }
+        }
+        
+        // 切换到数据源选择模式
+        function switchToSourceMode(index, $select) {
+            $select.html(`
+                <option value="manual" selected>手动录入</option>
+                <option value="dict">数据字典</option>
+            `);
+            $select.data('mode', 'source');
+            $select.data('dict-type', '');
+            const $columnItem = $(`.column-item[data-column-index="${index}"]`);
+            const $dictConfig = $columnItem.find('.column-dict-config');
+            $dictConfig.removeClass('enabled');
+        }
+        
+        function removeColumn(index) {
+            $(`.column-item[data-column-index="${index}"]`).remove();
+            updateEmptyHint();
+            updateMoveUpButtons();
+        }
+        
+        function moveColumnUp(index) {
+            const $currentItem = $(`.column-item[data-column-index="${index}"]`);
+            const $prevItem = $currentItem.prev('.column-item');
+            
+            if ($prevItem.length === 0) {
+                return; // 已经是第一个，无法上移
+            }
+            
+            // 交换两个元素的位置
+            $prevItem.before($currentItem);
+            
+            // 更新所有按钮状态
+            updateMoveUpButtons();
+        }
+        
+        function updateMoveUpButtons() {
+            const $columnItems = $('#columnsContainer .column-item');
+            $columnItems.each(function(index) {
+                const $item = $(this);
+                const $moveUpBtn = $item.find('.btn-move-up');
+                
+                // 第一个列的上移按钮应该被禁用
+                if (index === 0) {
+                    $moveUpBtn.prop('disabled', true);
+                } else {
+                    $moveUpBtn.prop('disabled', false);
+                }
+            });
+        }
+        
+        function updateEmptyHint() {
+            const container = $('#columnsContainer');
+            if (container.children('.column-item').length === 0) {
+                container.html('<div class="empty-columns" id="emptyColumnsHint">暂无列定义，请点击"添加列"按钮添加</div>');
+            }
+        }
+        
+        function clearColumns() {
+            $('#columnsContainer').html('<div class="empty-columns" id="emptyColumnsHint">暂无列定义，请点击"添加列"按钮添加</div>');
+            columnIndex = 0;
+        }
+        
+        function loadColumnsFromJSON(jsonStr) {
+            clearColumns();
+            
+            if (!jsonStr) {
+                return;
+            }
+            
+            // 先加载字典类型，然后再加载列
+            loadDictTypes().then(function() {
+                try {
+                    const json = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+                    if (json.columns && Array.isArray(json.columns)) {
+                        json.columns.forEach(column => {
+                            addColumn({
+                                name: column.name || '',
+                                label: column.label || column.name || '',
+                                required: column.required === true || column.required === 'true',
+                                useDict: column.useDict === true || column.useDict === 'true',
+                                dictType: column.dictType || ''
+                            });
+                        });
+                        // 确保所有列加载完成后，按钮状态正确
+                        updateMoveUpButtons();
+                    }
+                } catch(e) {
+                    console.error('解析列定义JSON失败:', e);
+                    alert('解析列定义失败，请检查JSON格式');
+                }
+            });
+        }
+        
+        function getColumnsAsJSON() {
+            const columns = [];
+            $('#columnsContainer .column-item').each(function() {
+                const $item = $(this);
+                const name = $item.find('.column-name').val().trim();
+                const label = $item.find('.column-label').val().trim();
+                const requiredValue = $item.find('.column-required').val();
+                const required = requiredValue === 'yes';
+                const $dataSource = $item.find('.column-data-source');
+                const dataSourceMode = $dataSource.data('mode');
+                const selectedValue = $dataSource.val();
+                
+                // 判断是否使用字典
+                let useDict = false;
+                let dictType = '';
+                if (dataSourceMode === 'dict' && selectedValue && selectedValue !== 'manual') {
+                    useDict = true;
+                    dictType = selectedValue;
+                }
+                
+                if (name && label) {
+                    const columnObj = {
+                        name: name,
+                        label: label,
+                        required: required
+                    };
+                    
+                    // 如果选择了数据字典，添加字典配置
+                    if (useDict && dictType) {
+                        columnObj.useDict = true;
+                        columnObj.dictType = dictType;
+                    }
+                    
+                    columns.push(columnObj);
+                }
+            });
+            
+            return JSON.stringify({ columns: columns });
+        }
+        
+        function showTemplateModal(id = null) {
+            $('#templateForm')[0].reset();
+            $('#templateId').val('');
+            $('#templateModalTitle').text(id ? '编辑模版' : '新增模版');
+            clearColumns();
+            
+            if (id) {
+                $.ajax({
+                    url: '/system/template/getInfoById?id=' + id,
+                    type: 'GET',
+                    success: function(result) {
+                        if (result.code === 2000) {
+                            const data = result.data;
+                            $('#templateId').val(data.id);
+                            $('#templateType').val(data.templateType);
+                            $('#templateName').val(data.templateName);
+                            $('#templateType').prop('readonly', true); // 编辑时不允许修改模版类型
+                            
+                            // 从JSON加载列定义
+                            loadColumnsFromJSON(data.columnDefinitions);
+                        }
+                    }
+                });
+            } else {
+                $('#templateType').prop('readonly', false);
+            }
+            
+            $('#templateModal').addClass('active');
+        }
+        
+        function closeTemplateModal() {
+            $('#templateModal').removeClass('active');
+            $('#templateType').prop('readonly', false);
+            clearColumns();
+        }
+        
+        function saveTemplate() {
+            const id = $('#templateId').val();
+            
+            // 验证基本字段
+            const templateType = $('#templateType').val().trim();
+            const templateName = $('#templateName').val().trim();
+            
+            if (!templateType) {
+                alert('请输入模版类型');
+                return;
+            }
+            
+            if (!templateName) {
+                alert('请输入模版名称');
+                return;
+            }
+            
+            // 收集列定义
+            const columns = [];
+            let hasError = false;
+            $('#columnsContainer .column-item').each(function() {
+                const $item = $(this);
+                const name = $item.find('.column-name').val().trim();
+                const label = $item.find('.column-label').val().trim();
+                
+                if (!name) {
+                    alert('请填写所有列的列名');
+                    $item.find('.column-name').focus();
+                    hasError = true;
+                    return false;
+                }
+                
+                if (!label) {
+                    alert('请填写所有列的显示标签');
+                    $item.find('.column-label').focus();
+                    hasError = true;
+                    return false;
+                }
+                
+                const requiredValue = $item.find('.column-required').val();
+                const required = requiredValue === 'yes';
+                const $dataSource = $item.find('.column-data-source');
+                const dataSourceMode = $dataSource.data('mode');
+                const selectedValue = $dataSource.val();
+                
+                // 判断是否使用字典
+                let useDict = false;
+                let dictType = '';
+                if (dataSourceMode === 'dict' && selectedValue && selectedValue !== 'manual') {
+                    useDict = true;
+                    dictType = selectedValue;
+                }
+                
+                // 如果选择了数据字典，必须选择字典类型
+                if (dataSourceMode === 'dict' && (!selectedValue || selectedValue === 'manual')) {
+                    alert(`列"${label || name}"选择了数据字典，请选择具体的字典类型`);
+                    $dataSource.focus();
+                    hasError = true;
+                    return false;
+                }
+                
+                const columnObj = {
+                    name: name,
+                    label: label,
+                    required: required
+                };
+                
+                // 如果选择了数据字典，添加字典配置
+                if (useDict && dictType) {
+                    columnObj.useDict = true;
+                    columnObj.dictType = dictType;
+                }
+                
+                columns.push(columnObj);
+            });
+            
+            if (hasError) {
+                return;
+            }
+            
+            if (columns.length === 0) {
+                alert('请至少添加一个列定义');
+                return;
+            }
+            
+            // 转换为JSON
+            const columnDefinitions = JSON.stringify({ columns: columns });
+            
+            const data = {
+                templateType: templateType,
+                templateName: templateName,
+                columnDefinitions: columnDefinitions
+            };
+            
+            if (id) {
+                data.id = id; // 保持字符串格式，避免大整数精度丢失
+            }
+            
+            const url = id ? '/system/template/updateData' : '/system/template/insertData';
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert(id ? '更新成功' : '创建成功');
+                        closeTemplateModal();
+                        loadTemplates(currentTemplatePage);
+                    } else {
+                        alert('操作失败: ' + result.msg);
+                    }
+                },
+                error: function(xhr) {
+                    alert('操作失败: ' + (xhr.responseJSON?.msg || '未知错误'));
+                }
+            });
+        }
+        
+        function editTemplate(id) {
+            showTemplateModal(id);
+        }
+        
+        function deleteTemplate(id) {
+            if (!confirm('确定要删除这条模版吗？')) {
+                return;
+            }
+            
+            $.ajax({
+                url: '/system/template/deleteData',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify([id]),
+                success: function(result) {
+                    if (result.code === 2000) {
+                        alert('删除成功');
+                        loadTemplates(currentTemplatePage);
+                    } else {
+                        alert('删除失败: ' + result.msg);
+                    }
+                }
+            });
+        }
+        
+        // 工具函数
+        function renderPagination(id, pageData, callback) {
+            const pagination = $('#' + id);
+            const totalPages = pageData.pages || 1;
+            const currentPage = pageData.current || 1;
+            
+            if (totalPages <= 1) {
+                pagination.html('');
+                return;
+            }
+            
+            let html = `
+                <button onclick="${callback.name}(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${currentPage} / ${totalPages} 页，共 ${pageData.total || 0} 条</span>
+                <button onclick="${callback.name}(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>下一页</button>
+            `;
+            pagination.html(html);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
+

@@ -40,10 +40,35 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
+*.tar
+
+# Node.js
+node_modules/
 
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+# 允许所有前端文件
+!*.html
+!*.css
+!*.js
+!*.vue
+!*.ts
+!*.jsx
+!*.tsx
+
+# 允许静态资源
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!*.svg
+!*.ico
+!*.woff
+!*.woff2
+!*.ttf
+!*.eot
 
 ### JRebel ###
 rebel.xml

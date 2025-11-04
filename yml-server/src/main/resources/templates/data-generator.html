@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLBB 数据生成器</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 30px;
+            border-bottom: 4px solid #3498db;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            min-height: 600px;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4a6278;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 20px 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tr:hover {
+            background: #ecf0f1;
+        }
+        
+        .btn-new {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        .btn-new:hover {
+            background: #27ae60;
+        }
+        
+        footer {
+            background: #ecf0f1;
+            padding: 15px 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #bdc3c7;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .scenario-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .success {
+            color: #2ecc71;
+        }
+        
+        .error {
+            color: #e74c3c;
+        }
+        
+        /* 新增样式 */
+        .sidebar-header {
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-content {
+            padding-top: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #3498db;
+        }
+        
+        .header-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #7f8c8d;
+        }
+        
+        .btn-outline:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .status-error {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .scenario-card {
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .scenario-card:hover {
+            border-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .scenario-card.selected {
+            border-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .scenario-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .scenario-desc {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .progress-steps {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: #ecf0f1;
+            z-index: 1;
+        }
+        
+        .step.completed:not(:last-child)::after {
+            background-color: #2ecc71;
+        }
+        
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            position: relative;
+            z-index: 2;
+            border: 2px solid #ddd;
+        }
+        
+        .step.active .step-icon {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .step.completed .step-icon {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .step.active .step-label {
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .step.completed .step-label {
+            color: #2ecc71;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .json-editor {
+            font-family: monospace;
+            min-height: 120px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>BLBB 数据生成器</h1>
+        </div>
+        <div class="sidebar-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class='bx bx-info-circle'></i>
+                        使用说明
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>本工具用于快速生成测试数据，支持以下数据类型：</p>
+                    <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>上下文数据 (Context)</li>
+                        <li>模板定义 (Template)</li>
+                        <li>标题数据 (Title)</li>
+                        <li>配置数据 (Config Data)</li>
+                        <li>字典数据 (Dict Type/Data)</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem;">选择业务场景，然后点击"生成数据"按钮开始创建。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="header">
+            <div class="header-title">数据生成器</div>
+            <div class="user-menu">
+                <span id="currentUsername" class="status-badge status-success">
+                    <i class='bx bx-user'></i>
+                    管理员
+                </span>
+                <a href="/blbb/editor" class="btn btn-outline">
+                    <i class='bx bx-arrow-back'></i>
+                    返回编辑器
+                </a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class='bx bx-layer'></i>
+                        选择业务场景
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="scenario-selector">
+                        <div class="scenario-card" data-scenario="user_permission">
+                            <div class="scenario-title">用户权限配置</div>
+                            <div class="scenario-desc">包含用户权限相关的配置数据</div>
+                        </div>
+                        <div class="scenario-card" data-scenario="role_config">
+                            <div class="scenario-title">角色配置</div>
+                            <div class="scenario-desc">包含角色管理相关的配置数据</div>
+                        </div>
+                        <div class="scenario-card" data-scenario="order_status">
+                            <div class="scenario-title">订单状态</div>
+                            <div class="scenario-desc">包含订单状态流转相关的配置</div>
+                        </div>
+                        <div class="scenario-card" data-scenario="payment_method">
+                            <div class="scenario-title">支付方式</div>
+                            <div class="scenario-desc">包含支付方式相关的配置数据</div>
+                        </div>
+                        <div class="scenario-card" data-scenario="promotion_rules">
+                            <div class="scenario-title">促销规则</div>
+                            <div class="scenario-desc">包含促销活动规则相关的配置</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-steps">
+                        <div class="step active" data-step="1">
+                            <div class="step-icon">1</div>
+                            <div class="step-label">选择场景</div>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-icon">2</div>
+                            <div class="step-label">创建上下文</div>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-icon">3</div>
+                            <div class="step-label">创建模板</div>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-icon">4</div>
+                            <div class="step-label">创建标题</div>
+                        </div>
+                        <div class="step" data-step="5">
+                            <div class="step-icon">5</div>
+                            <div class="step-label">创建配置数据</div>
+                        </div>
+                    </div>
+
+                    <div id="step1" class="tab-content active">
+                        <div class="alert alert-success">
+                            <i class='bx bx-info-circle'></i>
+                            请从上方选择一个业务场景
+                        </div>
+                        <button id="btnNextStep1" class="btn btn-primary" disabled>
+                            <i class='bx bx-right-arrow-alt'></i>
+                            下一步
+                        </button>
+                    </div>
+
+                    <div id="step2" class="tab-content">
+                        <div class="form-group">
+                            <div class="card-title" style="margin-bottom: 1rem;">
+                                <i class='bx bx-folder'></i>
+                                创建上下文数据
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">父级上下文ID</label>
+                                <input type="number" id="parentId" placeholder="留空表示根节点">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">上下文路径</label>
+                                <input type="text" id="contextPath" placeholder="例如: /system/user">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">节点名称</label>
+                                <input type="text" id="nodeName" placeholder="例如: user">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">节点层级</label>
+                                <input type="number" id="nodeLevel" placeholder="根节点为0，逐级递增">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">描述信息</label>
+                                <textarea id="description" placeholder="描述该上下文的用途"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">是否有具体配置</label>
+                                <select id="hasConfig">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 1rem;">
+                            <button id="btnPrevStep2" class="btn btn-outline">
+                                <i class='bx bx-left-arrow-alt'></i>
+                                上一步
+                            </button>
+                            <button id="btnCreateContext" class="btn btn-primary">
+                                <i class='bx bx-save'></i>
+                                创建上下文
+                            </button>
+                        </div>
+                        <div id="contextResult" class="alert" style="display: none;"></div>
+                    </div>
+
+                    <div id="step3" class="tab-content">
+                        <div class="form-group">
+                            <div class="card-title" style="margin-bottom: 1rem;">
+                                <i class='bx bx-code-block'></i>
+                                创建模板定义
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">模板类型</label>
+                                <input type="text" id="templateType" placeholder="例如: user_permission">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">模板名称</label>
+                                <input type="text" id="templateName" placeholder="例如: 用户权限配置">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">列定义 (JSON格式)</label>
+                                <textarea id="columnDefinitions" class="json-editor" placeholder='{"columns": [{"name": "permission_code", "label": "权限代码", "type": "string", "required": true}]}'></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 1rem;">
+                            <button id="btnPrevStep3" class="btn btn-outline">
+                                <i class='bx bx-left-arrow-alt'></i>
+                                上一步
+                            </button>
+                            <button id="btnCreateTemplate" class="btn btn-primary">
+                                <i class='bx bx-save'></i>
+                                创建模板
+                            </button>
+                        </div>
+                        <div id="templateResult" class="alert" style="display: none;"></div>
+                    </div>
+
+                    <div id="step4" class="tab-content">
+                        <div class="form-group">
+                            <div class="card-title" style="margin-bottom: 1rem;">
+                                <i class='bx bx-heading'></i>
+                                创建标题数据
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">上下文ID</label>
+                                <input type="number" id="titleContextId" placeholder="关联的上下文ID">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">标题键名</label>
+                                <input type="text" id="titleKey" placeholder="例如: admin.permission">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">标题名称</label>
+                                <input type="text" id="titleName" placeholder="例如: 管理员权限配置">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">模板类型</label>
+                                <input type="text" id="titleTemplateType" placeholder="例如: user_permission">
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 1rem;">
+                            <button id="btnPrevStep4" class="btn btn-outline">
+                                <i class='bx bx-left-arrow-alt'></i>
+                                上一步
+                            </button>
+                            <button id="btnCreateTitle" class="btn btn-primary">
+                                <i class='bx bx-save'></i>
+                                创建标题
+                            </button>
+                        </div>
+                        <div id="titleResult" class="alert" style="display: none;"></div>
+                    </div>
+
+                    <div id="step5" class="tab-content">
+                        <div class="form-group">
+                            <div class="card-title" style="margin-bottom: 1rem;">
+                                <i class='bx bx-data'></i>
+                                创建配置数据
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">标题ID</label>
+                                <input type="number" id="configTitleId" placeholder="关联的标题ID">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">模板类型</label>
+                                <input type="text" id="configTemplateType" placeholder="例如: user_permission">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">行数据 (JSON格式)</label>
+                                <textarea id="rowData" class="json-editor" placeholder='{"permission_code": "admin:view", "permission_name": "管理员查看权限"}'></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">版本</label>
+                                <input type="number" id="version" value="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">是否激活</label>
+                                <select id="isActive">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 1rem;">
+                            <button id="btnPrevStep5" class="btn btn-outline">
+                                <i class='bx bx-left-arrow-alt'></i>
+                                上一步
+                            </button>
+                            <button id="btnCreateConfigData" class="btn btn-primary">
+                                <i class='bx bx-save'></i>
+                                创建配置数据
+                            </button>
+                        </div>
+                        <div id="configResult" class="alert" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class='bx bx-list-ul'></i>
+                        创建结果
+                    </div>
+                    <button id="btnViewInEditor" class="btn btn-outline" disabled>
+                        <i class='bx bx-show'></i>
+                        在编辑器中查看
+                    </button>
+                </div>
+                <div class="card-body">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>数据类型</th>
+                                <th>ID</th>
+                                <th>名称/键</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #7f8c8d;">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // API 端点
+    const api = {
+        context: '/system/context/insertData',
+        template: '/system/template/insertData',
+        title: '/system/title/insertData',
+        configData: '/system/configData/insertData',
+        dictType: '/system/dictType/insertData',
+        dictData: '/system/dictData/insertData'
+    };
+
+    // 全局变量存储创建的数据ID
+    const createdData = {
+        contextId: null,
+        templateType: null,
+        titleId: null,
+        configDataId: null
+    };
+
+    // 业务场景数据模板
+    const scenarioTemplates = {
+        user_permission: {
+            context: {
+                parentId: 1, // 假设 /system 的ID为1
+                contextPath: '/system/user',
+                nodeName: 'user',
+                nodeLevel: 1,
+                description: '用户权限管理配置',
+                hasConfig: true
+            },
+            template: {
+                templateType: 'user_permission',
+                templateName: '用户权限配置',
+                columnDefinitions: JSON.stringify({
+                    columns: [
+                        {name: "permission_code", label: "权限代码", type: "string", required: true},
+                        {name: "permission_name", label: "权限名称", type: "string", required: true},
+                        {name: "permission_desc", label: "权限描述", type: "string", required: false},
+                        {name: "is_enabled", label: "是否启用", type: "boolean", required: true}
+                    ]
+                })
+            },
+            title: {
+                titleKey: 'admin.permission',
+                titleName: '管理员权限配置',
+                templateType: 'user_permission'
+            },
+            configData: {
+                templateType: 'user_permission',
+                rowData: JSON.stringify({
+                    permission_code: 'admin:view',
+                    permission_name: '管理员查看权限',
+                    permission_desc: '允许查看管理员页面',
+                    is_enabled: true
+                }),
+                version: 1,
+                isActive: true
+            }
+        },
+        role_config: {
+            context: {
+                parentId: 1,
+                contextPath: '/system/role',
+                nodeName: 'role',
+                nodeLevel: 1,
+                description: '角色管理配置',
+                hasConfig: true
+            },
+            template: {
+                templateType: 'role_config',
+                templateName: '角色配置',
+                columnDefinitions: JSON.stringify({
+                    columns: [
+                        {name: "role_code", label: "角色代码", type: "string", required: true},
+                        {name: "role_name", label: "角色名称", type: "string", required: true},
+                        {name: "role_desc", label: "角色描述", type: "string", required: false},
+                        {name: "priority", label: "优先级", type: "number", required: true}
+                    ]
+                })
+            },
+            title: {
+                titleKey: 'system.roles',
+                titleName: '系统角色配置',
+                templateType: 'role_config'
+            },
+            configData: {
+                templateType: 'role_config',
+                rowData: JSON.stringify({
+                    role_code: 'admin',
+                    role_name: '系统管理员',
+                    role_desc: '拥有系统所有权限',
+                    priority: 100
+                }),
+                version: 1,
+                isActive: true
+            }
+        },
+        order_status: {
+            context: {
+                parentId: 1,
+                contextPath: '/system/order',
+                nodeName: 'order',
+                nodeLevel: 1,
+                description: '订单状态配置',
+                hasConfig: true
+            },
+            template: {
+                templateType: 'order_status',
+                templateName: '订单状态配置',
+                columnDefinitions: JSON.stringify({
+                    columns: [
+                        {name: "status_code", label: "状态代码", type: "string", required: true},
+                        {name: "status_name", label: "状态名称", type: "string", required: true},
+                        {name: "status_desc", label: "状态描述", type: "string", required: false},
+                        {name: "next_status", label: "下一状态", type: "string", required: false}
+                    ]
+                })
+            },
+            title: {
+                titleKey: 'order.status',
+                titleName: '订单状态配置',
+                templateType: 'order_status'
+            },
+            configData: {
+                templateType: 'order_status',
+                rowData: JSON.stringify({
+                    status_code: 'created',
+                    status_name: '已创建',
+                    status_desc: '订单已创建但未支付',
+                    next_status: 'paid'
+                }),
+                version: 1,
+                isActive: true
+            }
+        },
+        payment_method: {
+            context: {
+                parentId: 1,
+                contextPath: '/system/payment',
+                nodeName: 'payment',
+                nodeLevel: 1,
+                description: '支付方式配置',
+                hasConfig: true
+            },
+            template: {
+                templateType: 'payment_method',
+                templateName: '支付方式配置',
+                columnDefinitions: JSON.stringify({
+                    columns: [
+                        {name: "method_code", label: "方式代码", type: "string", required: true},
+                        {name: "method_name", label: "方式名称", type: "string", required: true},
+                        {name: "method_desc", label: "方式描述", type: "string", required: false},
+                        {name: "is_enabled", label: "是否启用", type: "boolean", required: true}
+                    ]
+                })
+            },
+            title: {
+                titleKey: 'payment.methods',
+                titleName: '支付方式配置',
+                templateType: 'payment_method'
+            },
+            configData: {
+                templateType: 'payment_method',
+                rowData: JSON.stringify({
+                    method_code: 'alipay',
+                    method_name: '支付宝',
+                    method_desc: '使用支付宝进行支付',
+                    is_enabled: true
+                }),
+                version: 1,
+                isActive: true
+            }
+        },
+        promotion_rules: {
+            context: {
+                parentId: 1,
+                contextPath: '/system/promotion',
+                nodeName: 'promotion',
+                nodeLevel: 1,
+                description: '促销规则配置',
+                hasConfig: true
+            },
+            template: {
+                templateType: 'promotion_rules',
+                templateName: '促销规则配置',
+                columnDefinitions: JSON.stringify({
+                    columns: [
+                        {name: "rule_code", label: "规则代码", type: "string", required: true},
+                        {name: "rule_name", label: "规则名称", type: "string", required: true},
+                        {name: "discount_type", label: "折扣类型", type: "string", required: true},
+                        {name: "discount_value", label: "折扣值", type: "number", required: true},
+                        {name: "start_time", label: "开始时间", type: "datetime", required: true},
+                        {name: "end_time", label: "结束时间", type: "datetime", required: true}
+                    ]
+                })
+            },
+            title: {
+                titleKey: 'promotion.rules',
+                titleName: '促销规则配置',
+                templateType: 'promotion_rules'
+            },
+            configData: {
+                templateType: 'promotion_rules',
+                rowData: JSON.stringify({
+                    rule_code: 'new_user_discount',
+                    rule_name: '新用户折扣',
+                    discount_type: 'percentage',
+                    discount_value: 90,
+                    start_time: '2023-01-01 00:00:00',
+                    end_time: '2023-12-31 23:59:59'
+                }),
+                version: 1,
+                isActive: true
+            }
+        }
+    };
+
+    // 当前选中的场景
+    let currentScenario = null;
+
+    // 初始化页面
+    $(document).ready(function() {
+        // 场景选择
+        $('.scenario-card').on('click', function() {
+            $('.scenario-card').removeClass('selected');
+            $(this).addClass('selected');
+            currentScenario = $(this).data('scenario');
+            $('#btnNextStep1').prop('disabled', false);
+        });
+
+        // 步骤导航
+        $('#btnNextStep1').on('click', function() {
+            if (!currentScenario) return;
+            
+            // 预填充表单
+            const template = scenarioTemplates[currentScenario];
+            $('#parentId').val(template.context.parentId);
+            $('#contextPath').val(template.context.contextPath);
+            $('#nodeName').val(template.context.nodeName);
+            $('#nodeLevel').val(template.context.nodeLevel);
+            $('#description').val(template.context.description);
+            $('#hasConfig').val(template.context.hasConfig.toString());
+            
+            showStep(2);
+        });
+
+        $('#btnPrevStep2').on('click', function() {
+            showStep(1);
+        });
+
+        $('#btnPrevStep3').on('click', function() {
+            showStep(2);
+        });
+
+        $('#btnPrevStep4').on('click', function() {
+            showStep(3);
+        });
+
+        $('#btnPrevStep5').on('click', function() {
+            showStep(4);
+        });
+
+        // 创建上下文
+        $('#btnCreateContext').on('click', function() {
+            const parentIdVal = $('#parentId').val();
+            
+            // 构建上下文数据，处理 parentId (Long) 精度问题
+            let contextData;
+            if (!parentIdVal || parentIdVal.trim() === '') {
+                contextData = {
+                    parentId: null,
+                    contextPath: $('#contextPath').val(),
+                    nodeName: $('#nodeName').val(),
+                    nodeLevel: parseInt($('#nodeLevel').val()),
+                    description: $('#description').val(),
+                    hasConfig: $('#hasConfig').val() === 'true'
+                };
+            } else {
+                const parentIdStr = parentIdVal.trim();
+                // 验证 parentId 格式
+                if (!/^\d+$/.test(parentIdStr)) {
+                    alert('父级ID格式错误，请输入数字');
+                    return;
+                }
+                
+                // 检查是否在 Java Long 范围内
+                try {
+                    const bigInt = BigInt(parentIdStr);
+                    const maxLong = BigInt('9223372036854775807');
+                    if (bigInt > maxLong) {
+                        alert('父级ID超出有效范围');
+                        return;
+                    }
+                } catch (e) {
+                    alert('父级ID格式错误');
+                    return;
+                }
+                
+                // 判断是否在 JavaScript Number 安全范围内
+                const isInSafeRange = parentIdStr.length <= 15;
+                
+                if (isInSafeRange) {
+                    // 在安全范围内，使用 JSON.stringify（会转换为数字）
+                    contextData = {
+                        parentId: Number(parentIdStr),
+                        contextPath: $('#contextPath').val(),
+                        nodeName: $('#nodeName').val(),
+                        nodeLevel: parseInt($('#nodeLevel').val()),
+                        description: $('#description').val(),
+                        hasConfig: $('#hasConfig').val() === 'true'
+                    };
+                } else {
+                    // 超出安全范围，手动构建 JSON，将 parentId 作为数字字面量（不带引号）
+                    const contextPath = $('#contextPath').val();
+                    const nodeName = $('#nodeName').val();
+                    const nodeLevel = parseInt($('#nodeLevel').val()) || 0;
+                    const description = $('#description').val() || '';
+                    const hasConfig = $('#hasConfig').val() === 'true';
+                    
+                    // 对字符串进行 JSON 转义
+                    function escapeJsonString(str) {
+                        if (!str) return '';
+                        return str.replace(/\\/g, '\\\\')
+                                 .replace(/"/g, '\\"')
+                                 .replace(/\n/g, '\\n')
+                                 .replace(/\r/g, '\\r')
+                                 .replace(/\t/g, '\\t');
+                    }
+                    
+                    // 手动构建 JSON，将 parentId 作为数字字面量
+                    const jsonData = '{"parentId":' + parentIdStr + 
+                                  ',"contextPath":"' + escapeJsonString(contextPath) + '"' +
+                                  ',"nodeName":"' + escapeJsonString(nodeName) + '"' +
+                                  ',"nodeLevel":' + nodeLevel +
+                                  ',"description":"' + escapeJsonString(description) + '"' +
+                                  ',"hasConfig":' + hasConfig + '}';
+                    
+                    // 直接发送 JSON 字符串，不使用 createData 函数
+                    $.ajax({
+                        url: api.context,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: jsonData,
+                        success: function(res) {
+                            if (res.code === 2000) {
+                                showAlert('contextResult', '创建成功！', 'success');
+                                createdData.contextId = res.data?.id || null;
+                                addResultRow('上下文', res.data?.id || null, nodeName, '成功');
+                                
+                                // 预填充模板表单
+                                const template = scenarioTemplates[currentScenario].template;
+                                $('#templateType').val(template.templateType);
+                                $('#templateName').val(template.templateName);
+                                $('#columnDefinitions').val(template.columnDefinitions);
+                                
+                                showStep(3);
+                            } else {
+                                showAlert('contextResult', `创建失败：${res.message}`, 'danger');
+                            }
+                        },
+                        error: function(xhr) {
+                            showAlert('contextResult', `请求错误：${xhr.status} ${xhr.statusText}`, 'danger');
+                        }
+                    });
+                    return; // 提前返回，不使用 createData
+                }
+            }
+
+            createData('context', contextData, function(result) {
+                if (result.success) {
+                    createdData.contextId = result.data.id;
+                    addResultRow('上下文', result.data.id, contextData.nodeName, '成功');
+                    
+                    // 预填充模板表单
+                    const template = scenarioTemplates[currentScenario].template;
+                    $('#templateType').val(template.templateType);
+                    $('#templateName').val(template.templateName);
+                    $('#columnDefinitions').val(template.columnDefinitions);
+                    
+                    showStep(3);
+                }
+            });
+        });
+
+        // 创建模板
+        $('#btnCreateTemplate').on('click', function() {
+            const data = {
+                templateType: $('#templateType').val(),
+                templateName: $('#templateName').val(),
+                columnDefinitions: $('#columnDefinitions').val()
+            };
+
+            createData('template', data, function(result) {
+                if (result.success) {
+                    createdData.templateType = data.templateType;
+                    addResultRow('模板', null, data.templateType, '成功');
+                    
+                    // 预填充标题表单
+                    const titleTemplate = scenarioTemplates[currentScenario].title;
+                    $('#titleContextId').val(createdData.contextId);
+                    $('#titleKey').val(titleTemplate.titleKey);
+                    $('#titleName').val(titleTemplate.titleName);
+                    $('#titleTemplateType').val(titleTemplate.templateType);
+                    
+                    showStep(4);
+                }
+            });
+        });
+
+        // 创建标题
+        $('#btnCreateTitle').on('click', function() {
+            const contextIdVal = $('#titleContextId').val();
+            const data = {
+                contextId: contextIdVal ? Number(contextIdVal) : null,
+                titleKey: $('#titleKey').val(),
+                titleName: $('#titleName').val(),
+                templateType: $('#titleTemplateType').val()
+            };
+
+            createData('title', data, function(result) {
+                if (result.success) {
+                    createdData.titleId = result.data.id;
+                    addResultRow('标题', result.data.id, data.titleName, '成功');
+                    
+                    // 预填充配置数据表单
+                    const configTemplate = scenarioTemplates[currentScenario].configData;
+                    $('#configTitleId').val(createdData.titleId);
+                    $('#configTemplateType').val(configTemplate.templateType);
+                    $('#rowData').val(configTemplate.rowData);
+                    $('#version').val(configTemplate.version);
+                    $('#isActive').val(configTemplate.isActive.toString());
+                    
+                    showStep(5);
+                }
+            });
+        });
+
+        // 创建配置数据
+        $('#btnCreateConfigData').on('click', function() {
+            // 注意：BlbbConfigDataCreateDTO 中不包含 titleId 字段，此字段会被忽略
+            const data = {
+                templateType: $('#configTemplateType').val(),
+                rowData: $('#rowData').val(),
+                version: parseInt($('#version').val()),
+                isActive: $('#isActive').val() === 'true'
+            };
+
+            createData('configData', data, function(result) {
+                if (result.success) {
+                    createdData.configDataId = result.data.id;
+                    addResultRow('配置数据', result.data.id, data.templateType, '成功');
+                    
+                    // 启用查看按钮
+                    $('#btnViewInEditor').prop('disabled', false);
+                    
+                    // 显示完成消息
+                    showAlert('configResult', '所有数据创建成功！您可以在编辑器中查看数据。', 'success');
+                    
+                    // 标记所有步骤为已完成
+                    $('.step').addClass('completed');
+                }
+            });
+        });
+
+        // 在编辑器中查看
+        $('#btnViewInEditor').on('click', function() {
+            window.location.href = '/blbb/editor';
+        });
+    });
+
+    // 显示指定步骤
+    function showStep(stepNumber) {
+        $('.tab-content').removeClass('active');
+        $(`#step${stepNumber}`).addClass('active');
+        
+        // 更新步骤指示器
+        $('.step').removeClass('active');
+        $(`.step[data-step="${stepNumber}"]`).addClass('active');
+        
+        // 标记之前的步骤为已完成
+        for (let i = 1; i < stepNumber; i++) {
+            $(`.step[data-step="${i}"]`).addClass('completed');
+        }
+    }
+
+    // 创建数据通用函数
+    function createData(type, data, callback) {
+        const resultId = `${type}Result`;
+        
+        $.ajax({
+            url: api[type],
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(res) {
+                if (res.code === 2000) {
+                    showAlert(resultId, '创建成功！', 'success');
+                    callback({success: true, data: res.data || {id: null}});
+                } else {
+                    showAlert(resultId, `创建失败：${res.message}`, 'danger');
+                    callback({success: false});
+                }
+            },
+            error: function(xhr) {
+                showAlert(resultId, `请求错误：${xhr.status} ${xhr.statusText}`, 'danger');
+                callback({success: false});
+            }
+        });
+    }
+
+    // 显示提示消息
+    function showAlert(elementId, message, type) {
+        const $alert = $(`#${elementId}`);
+        $alert.removeClass('alert-success alert-danger')
+              .addClass(`alert-${type}`)
+              .html(`<i class='bx bx-${type === 'success' ? 'check-circle' : 'error-circle'}'></i> ${message}`)
+              .show();
+        
+        // 5秒后自动隐藏
+        setTimeout(() => {
+            $alert.fadeOut();
+        }, 5000);
+    }
+
+    // 添加结果行
+    function addResultRow(type, id, name, status) {
+        // 如果是第一行数据，清空表格
+        if ($('#resultsTable tr:first').find('td[colspan]').length) {
+            $('#resultsTable').empty();
+        }
+        
+        const statusClass = status === '成功' ? 'status-success' : 'status-error';
+        const row = `
+            <tr>
+                <td>${type}</td>
+                <td>${id || '-'}</td>
+                <td>${name}</td>
+                <td><span class="status-badge ${statusClass}">${status}</span></td>
+            </tr>
+        `;
+        $('#resultsTable').append(row);
+    }
+</script>
+</body>
+</html>
+

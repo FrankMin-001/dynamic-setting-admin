@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: yml-server
+    name: dragon-dynamic-settings
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://123.207.11.78:30306/blbb_datasource?useSSL=false&serverTimezone=UTC
