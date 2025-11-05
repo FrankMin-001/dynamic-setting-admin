@@ -9,6 +9,7 @@ import com.smalldragon.yml.context.UserContext;
 import com.smalldragon.yml.system.dal.dictdata.BlbbDictDataDO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataCreateDTO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataPageDTO;
+import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataUpdateDTO;
 import com.smalldragon.yml.system.dal.dictdata.VO.BlbbDictDataVO;
 import com.smalldragon.yml.system.mapper.dictdata.BlbbDictDataMapper;
 import com.smalldragon.yml.system.service.dicthistory.BlbbDictHistoryService;
@@ -64,15 +65,14 @@ public class BlbbDictDataServiceImpl implements BlbbDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updateData(String id, BlbbDictDataCreateDTO updateDTO) {
+    public Boolean updateData(String id, BlbbDictDataUpdateDTO updateDTO) {
         BlbbDictDataDO db = blbbDictDataMapper.selectById(id);
         if (db == null) {
             throw new RuntimeException("字典数据不存在!");
         }
         // 校验唯一
         LambdaQueryWrapper<BlbbDictDataDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BlbbDictDataDO::getDictType, updateDTO.getDictType())
-                .eq(BlbbDictDataDO::getDictCode, updateDTO.getDictCode())
+        wrapper.eq(BlbbDictDataDO::getDictCode, updateDTO.getDictCode())
                 .ne(BlbbDictDataDO::getId, id);
         if (blbbDictDataMapper.selectOne(wrapper) != null) {
             throw new RuntimeException("字典编码已存在!");

@@ -5,6 +5,7 @@ import com.smalldragon.yml.pojo.CommonResult;
 import com.smalldragon.yml.system.dal.dictdata.BlbbDictDataDO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataCreateDTO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataPageDTO;
+import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataUpdateDTO;
 import com.smalldragon.yml.system.dal.dictdata.VO.BlbbDictDataVO;
 import com.smalldragon.yml.system.service.dictdata.BlbbDictDataService;
 import io.swagger.annotations.Api;
@@ -38,7 +39,7 @@ public class BlbbDictDataController {
     @ApiOperation("修改字典数据")
     @PostMapping("updateData")
     @ApiParam(name = "id", value = "字典数据ID", required = true)
-    public CommonResult<Boolean> updateData(@RequestParam("id") String id, @RequestBody @Validated BlbbDictDataCreateDTO updateDTO) {
+    public CommonResult<Boolean> updateData(@RequestParam("id") String id, @RequestBody @Validated BlbbDictDataUpdateDTO updateDTO) {
         return CommonResult.ok(blbbDictDataService.updateData(id, updateDTO));
     }
 

@@ -21,6 +21,6 @@ public class BlbbUserAccountCreateDTO implements Serializable {
 
     @ApiModelProperty(value = "密码（将使用BCrypt哈希加密存储）", example = "123456", required = true)
     @NotBlank(message = "密码不能为空!")
-    @Size(min = 6, max = 20, message = "密码长度在6-20位之间")
+    @Size(min = 5, max = 20, message = "密码长度在5-20位之间")
     private String password;
 }

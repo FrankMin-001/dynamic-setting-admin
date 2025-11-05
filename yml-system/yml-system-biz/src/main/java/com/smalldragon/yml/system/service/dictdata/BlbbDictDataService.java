@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.smalldragon.yml.system.dal.dictdata.BlbbDictDataDO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataCreateDTO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataPageDTO;
+import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataUpdateDTO;
 import com.smalldragon.yml.system.dal.dictdata.VO.BlbbDictDataVO;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface BlbbDictDataService {
 
     Boolean insertData(BlbbDictDataCreateDTO createDTO);
 
-    Boolean updateData(String id, BlbbDictDataCreateDTO updateDTO);
+    Boolean updateData(String id, BlbbDictDataUpdateDTO updateDTO);
 
     Boolean deleteData(List<String> ids);
 
