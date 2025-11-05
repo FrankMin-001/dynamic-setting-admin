@@ -98,14 +98,17 @@ public class BlbbConfigDataServiceImpl implements BlbbConfigDataService {
         for (String id : ids) {
             BlbbConfigDataDO before = blbbConfigDataMapper.selectById(id);
             if (before != null) {
+                // 删除也需要记录 newVersion，避免数据库 NOT NULL 约束报错
+                // 语义上：每次变更（含删除）版本 +1，用于历史记录追踪
+                String operatedBy = UserContext.getLoginUsername();
                 blbbVersionHistoryService.record(
                         before.getId(),
                         String.valueOf(before.getVersion()),
-                        null,
+                        String.valueOf(before.getVersion() + 1),
                         "DELETE",
                         "删除配置数据",
-                        before.getRowData(),
-                        UserContext.getLoginUsername()
+                        cn.hutool.json.JSONUtil.toJsonStr(before),
+                        operatedBy
                 );
             }
         }

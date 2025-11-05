@@ -3870,96 +3870,16 @@
             const $unsavedRows = $tbody.find('tr.editing').has('.btn-save');
 
             if ($unsavedRows.length > 0) {
-                // 有未保存的新行，提示用户
-                const confirmMsg = `检测到 ${$unsavedRows.length} 行未保存的数据。\n\n请选择：\n1. 点击"确定"保存这些数据（保存完成后将自动关闭编辑模式）\n2. 点击"取消"放弃这些数据`;
+                // 不进行保存，直接删除未保存的新行
+                $unsavedRows.each(function() {
+                    const $row = $(this);
+                    $row.remove();
+                });
 
-                if (confirm(confirmMsg)) {
-                    // 用户选择保存：逐个保存未保存的行
-                    let savedCount = 0;
-                    const totalCount = $unsavedRows.length;
-                    let hasError = false;
-
-                    // 获取保存所需的信息（从表格容器获取）
-                    const templateType = $tableContainer.attr('data-template-type');
-                    const columnsJson = $tableContainer.find('.btn-add-row').attr('data-columns');
-
-                    if (!columnsJson) {
-                        alert('无法获取列定义信息，请刷新页面后重试');
-                        return;
-                    }
-
-                    // 暂时禁用关闭编辑按钮，防止用户在保存过程中关闭
-                    $disableEditBtn.prop('disabled', true);
-                    $disableEditBtn.text('保存中...');
-
-                    // 逐个保存未保存的行
-                    $unsavedRows.each(function() {
-                        const $row = $(this);
-                        const $saveBtn = $row.find('.btn-save');
-                        if ($saveBtn.length > 0) {
-                            // 标记这是一个批量保存操作
-                            $row.data('batch-saving', true);
-
-                            // 保存行
-                            saveNewRowWithCallback($saveBtn[0], templateType, columnsJson, function(success) {
-                                savedCount++;
-                                if (!success) {
-                                    hasError = true;
-                                }
-
-                                // 检查是否所有行都保存完成
-                                if (savedCount >= totalCount) {
-                                    $disableEditBtn.prop('disabled', false);
-                                    $disableEditBtn.text('🔒 关闭编辑');
-
-                                    if (!hasError) {
-                                        // 所有保存都成功，重新加载数据，然后关闭编辑模式
-                                        const titleId = $tableContainer.attr('data-title-id');
-                                        const isConfigured = $tableContainer.attr('data-is-configured') === '1';
-                                        const titleInfoStr = $tableContainer.attr('data-title-info');
-                                        const titleInfo = titleInfoStr ? JSON.parse(titleInfoStr) : null;
-
-                                        // 解析columns
-                                        let columns;
-                                        try {
-                                            columns = typeof columnsJson === 'string' ? JSON.parse(decodeURIComponent(columnsJson)) : columnsJson;
-                                        } catch (e) {
-                                            console.error('解析列定义失败:', e);
-                                            return;
-                                        }
-
-                                        // 重新加载数据
-                                        loadConfigData($tbody, columns, titleId, isConfigured, titleInfo);
-
-                                        // 数据加载完成后，关闭编辑模式
-                                        // 注意：loadConfigData是异步的，我们需要在renderDataRows完成后关闭编辑模式
-                                        // 由于renderDataRows在loadConfigData的回调中执行，我们可以在renderDataRows的最后添加一个检查
-                                        // 但更简单的方式是：延迟关闭编辑模式，等待数据加载完成
-                                        setTimeout(function() {
-                                            toggleEditMode($tableContainer, false);
-                                        }, 500);
-                                    } else {
-                                        alert('部分数据保存失败，请检查后重试。编辑模式将保持开启状态。');
-                                    }
-                                }
-                            });
-                        }
-                    });
-
-                    // 返回，不立即关闭编辑模式，等待所有保存完成
-                    return;
-                } else {
-                    // 用户选择取消：删除未保存的新行
-                    $unsavedRows.each(function() {
-                        const $row = $(this);
-                        $row.remove();
-                    });
-
-                    // 如果删除后没有数据了，显示空状态
-                    if ($tbody.find('tr').length === 0) {
-                        const columnsCount = $tableContainer.find('table thead th').length;
-                        $tbody.html(`<tr><td colspan="${columnsCount}" style="text-align:center;padding:20px;color:#999;">暂无配置数据</td></tr>`);
-                    }
+                // 如果删除后没有数据了，显示空状态
+                if ($tbody.find('tr').length === 0) {
+                    const columnsCount = $tableContainer.find('table thead th').length;
+                    $tbody.html(`<tr><td colspan="${columnsCount}" style="text-align:center;padding:20px;color:#999;">暂无配置数据</td></tr>`);
                 }
             }
 
@@ -3985,7 +3905,8 @@
             return;
         }
 
-        const $tbody = $('.tab-content.active tbody');
+        const $tableContainer = $('.tab-content.active .data-table-container');
+        const $tbody = $tableContainer.find('table.data-table tbody');
         if ($tbody.length === 0) return;
 
         // 移除空行（没有操作按钮的行）
@@ -4039,7 +3960,8 @@
         $actionCell.append($cancelBtn);
         $newRow.append($actionCell);
 
-        $tbody.prepend($newRow);
+        // 追加到现有数据之后展示（仅追加到数据表，不影响历史版本表格）
+        $tbody.append($newRow);
     }
 
     // 编辑数据行
@@ -4125,7 +4047,45 @@
         }
 
         const $tr = $(btn).closest('tr');
+        const $tbody = $tr.closest('tbody');
 
+        // 如果存在多行处于新增编辑状态，执行批量保存，避免每行保存后立即刷新导致其他行消失
+        const $unsavedRows = $tbody.find('tr.editing').has('.btn-save');
+        if ($unsavedRows.length > 1) {
+            let savedCount = 0;
+            let totalCount = $unsavedRows.length;
+            let allSuccess = true;
+
+            $unsavedRows.each(function() {
+                const $row = $(this);
+                const $rowSaveBtn = $row.find('.btn-save').first();
+                saveNewRowWithCallback($rowSaveBtn[0], templateType, columnsJson, function(success) {
+                    if (!success) allSuccess = false;
+                    savedCount++;
+                    if (savedCount >= totalCount) {
+                        if (allSuccess) {
+                            const $tableContainer = $tbody.closest('.data-table-container');
+                            const titleId = $tableContainer.attr('data-title-id');
+                            const isConfigured = $tableContainer.attr('data-is-configured') === '1';
+                            const titleInfoStr = $tableContainer.attr('data-title-info');
+                            const titleInfo = titleInfoStr ? JSON.parse(titleInfoStr) : null;
+                            loadConfigData($tbody, columns, titleId, isConfigured, titleInfo);
+                            // 批量保存完成后，热更新历史版本区域
+                            const $versionContent = $tableContainer.siblings('.version-history-container').find('.version-history-content');
+                            if ($versionContent && $versionContent.length) {
+                                loadVersionHistory(titleId, $versionContent);
+                            }
+                            alert('全部保存成功');
+                        } else {
+                            alert('部分数据保存失败，请检查未保存的行后重试');
+                        }
+                    }
+                });
+            });
+            return; // 批量保存模式下，不再执行单行保存逻辑
+        }
+
+        // 单行保存逻辑
         const rowData = {};
         let hasError = false;
 
@@ -4145,12 +4105,9 @@
 
         if (hasError) return;
 
-        // 获取 titleId
-        const $tbody = $tr.closest('tbody');
         const $tableContainer = $tbody.closest('.data-table-container');
         const titleId = $tableContainer.attr('data-title-id');
 
-        // 保存数据
         $.ajax({
             url: '/system/configData/insertData',
             method: 'POST',
@@ -4165,14 +4122,15 @@
             success: function(res) {
                 if (res.code === 2000) {
                     alert('保存成功');
-                    // 重新加载数据
-                    const $tbody = $tr.closest('tbody');
-                    const $tableContainer = $tbody.closest('.data-table-container');
-                    const titleId = $tableContainer.attr('data-title-id');
                     const isConfigured = $tableContainer.attr('data-is-configured') === '1';
                     const titleInfoStr = $tableContainer.attr('data-title-info');
                     const titleInfo = titleInfoStr ? JSON.parse(titleInfoStr) : null;
                     loadConfigData($tbody, columns, titleId, isConfigured, titleInfo);
+                    // 保存成功后，热更新历史版本区域
+                    const $versionContent = $tableContainer.siblings('.version-history-container').find('.version-history-content');
+                    if ($versionContent && $versionContent.length) {
+                        loadVersionHistory(titleId, $versionContent);
+                    }
                 } else {
                     alert('保存失败: ' + (res.msg || '未知错误'));
                 }
@@ -4250,6 +4208,11 @@
                         const titleInfoStr = $tableContainer.attr('data-title-info');
                         const titleInfo = titleInfoStr ? JSON.parse(titleInfoStr) : null;
                         loadConfigData($tbody, columns, titleId, isConfigured, titleInfo);
+                        // 保存成功后，热更新历史版本区域
+                        const $versionContent = $tableContainer.siblings('.version-history-container').find('.version-history-content');
+                        if ($versionContent && $versionContent.length) {
+                            loadVersionHistory(titleId, $versionContent);
+                        }
                     }
                 } else {
                     alert('保存失败: ' + (res.msg || '未知错误'));
@@ -4303,6 +4266,11 @@
                     const titleInfoStr = $tableContainer.attr('data-title-info');
                     const titleInfo = titleInfoStr ? JSON.parse(titleInfoStr) : null;
                     loadConfigData($tbody, columns, titleId, isConfigured, titleInfo);
+                    // 编辑保存后，热更新历史版本区域
+                    const $versionContent = $tableContainer.siblings('.version-history-container').find('.version-history-content');
+                    if ($versionContent && $versionContent.length) {
+                        loadVersionHistory(titleId, $versionContent);
+                    }
                 } else {
                     alert('保存失败: ' + (res.msg || '未知错误'));
                 }
@@ -4363,10 +4331,10 @@
             success: function(res) {
                 if (res.code === 2000) {
                     alert('删除成功');
-                    // 重新加载数据
-                    const $tbody = $('.tab-content.active tbody');
-                    const $tableContainer = $tbody.closest('.data-table-container');
-                    const $addBtn = $('.tab-content.active .btn-add-row');
+                    // 重新加载当前数据表（仅作用数据表，不影响历史版本表）
+                    const $tableContainer = $('.tab-content.active .data-table-container');
+                    const $tbody = $tableContainer.find('table.data-table tbody');
+                    const $addBtn = $tableContainer.find('.btn-add-row');
                     const columnsJson = $addBtn.attr('data-columns');
                     let columns;
                     try {
@@ -4381,6 +4349,23 @@
                     const titleInfoStr = $tableContainer.attr('data-title-info');
                     const titleInfo = titleInfoStr ? JSON.parse(titleInfoStr) : null;
                     loadConfigData($tbody, columns, titleId, isConfigured, titleInfo);
+                    // 删除成功后，热更新历史版本区域
+                    const $versionContent = $tableContainer.siblings('.version-history-container').find('.version-history-content');
+                    if ($versionContent && $versionContent.length) {
+                        // 将刚删除的ID加入额外ID集合，确保历史版本能检索到
+                        const extras = $versionContent.data('extraConfigDataIds') || [];
+                        const delIdStr = String(dataId);
+                        if (extras.indexOf(delIdStr) === -1) {
+                            extras.push(delIdStr);
+                        }
+                        $versionContent.data('extraConfigDataIds', extras);
+                        // 立即热更新一次
+                        loadVersionHistory(titleId, $versionContent);
+                        // 稍后再更新一次，确保后端写入完成
+                        setTimeout(function() {
+                            loadVersionHistory(titleId, $versionContent);
+                        }, 500);
+                    }
                 } else {
                     alert('删除失败: ' + (res.msg || '未知错误'));
                 }
@@ -4491,7 +4476,11 @@
                         count: configDataIds.length
                     });
 
-                    if (configDataIds.length === 0) {
+                    // 将额外的配置数据ID（例如刚删除的数据ID）合并进来，避免删除后无法看到历史记录
+                    const extraIds = $container.data('extraConfigDataIds') || [];
+                    const mergedIds = Array.from(new Set([].concat(configDataIds || [], extraIds || [])));
+
+                    if (mergedIds.length === 0) {
                         $container.html('<div class="version-history-empty">该标题下暂无配置数据，无历史版本记录</div>');
                         return;
                     }
@@ -4500,7 +4489,7 @@
                     // 由于接口只支持单个configDataId，我们暂时不传configDataId，获取所有历史版本，然后前端过滤
                     // 或者可以为每个configDataId查询一次，然后合并结果
                     // 这里先实现一个简化版本：查询所有历史版本（不传configDataId），然后前端过滤
-                    loadVersionHistoryPage($container, titleId, configDataIds, 1, 10);
+                    loadVersionHistoryPage($container, titleId, mergedIds, 1, 10);
                 } else {
                     console.log('[loadVersionHistory] 该标题下暂无配置数据');
                     $container.html('<div class="version-history-empty">该标题下暂无配置数据，无历史版本记录</div>');
@@ -5227,6 +5216,14 @@
         const $select = $('#contextParentId');
         $select.html('<option value="">请选择父级上下文</option>');
 
+        // 提供根目录选项，用于创建顶级路径
+        const $rootOption = $('<option></option>')
+            .attr('value', 'ROOT')
+            .text('根目录')
+            .data('contextPath', '/')
+            .data('nodeLevel', 0);
+        $select.append($rootOption);
+
         function addOptions(contexts, prefix = '') {
             contexts.forEach(ctx => {
                 const displayText = prefix + (ctx.nodeName || ctx.contextPath) + (ctx.description ? ' - ' + ctx.description : '');
@@ -5375,27 +5372,32 @@
             return;
         }
 
-        // 验证 parentId 格式
+        // 验证 parentId 格式，支持选择“根目录”创建顶级路径
         let parentIdStr = null;
         if (parentId) {
             const trimmedId = String(parentId).trim();
-            // 验证是否为纯数字
-            if (!/^\d+$/.test(trimmedId)) {
-                alert('父级ID格式错误');
-                return;
-            }
-            // 检查是否在 Java Long 范围内
-            try {
-                const bigInt = BigInt(trimmedId);
-                const maxLong = BigInt('9223372036854775807');
-                if (bigInt > maxLong) {
-                    alert('父级ID超出有效范围');
+            if (trimmedId === 'ROOT') {
+                // 顶级路径，父级为空
+                parentIdStr = null;
+            } else {
+                // 验证是否为纯数字
+                if (!/^\d+$/.test(trimmedId)) {
+                    alert('父级ID格式错误');
                     return;
                 }
-                parentIdStr = trimmedId; // 保持为字符串，避免精度丢失
-            } catch (e) {
-                alert('父级ID格式错误');
-                return;
+                // 检查是否在 Java Long 范围内
+                try {
+                    const bigInt = BigInt(trimmedId);
+                    const maxLong = BigInt('9223372036854775807');
+                    if (bigInt > maxLong) {
+                        alert('父级ID超出有效范围');
+                        return;
+                    }
+                    parentIdStr = trimmedId; // 保持为字符串，避免精度丢失
+                } catch (e) {
+                    alert('父级ID格式错误');
+                    return;
+                }
             }
         }
 
@@ -6072,4 +6074,3 @@
 </script>
 </body>
 </html>
-
