@@ -3,6 +3,7 @@ package com.smalldragon.yml.system.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.smalldragon.yml.pojo.CommonResult;
 import com.smalldragon.yml.system.dal.dictdata.BlbbDictDataDO;
+import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataUpdateDTO;
 import com.smalldragon.yml.system.dal.dictdata.VO.BlbbDictDataVO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataCreateDTO;
 import com.smalldragon.yml.system.dal.dictdata.DTO.BlbbDictDataPageDTO;
@@ -39,7 +40,7 @@ public class BlbbDictDataControllerTest {
 
     @Test
     void updateData_shouldReturnTrue() {
-        BlbbDictDataCreateDTO dto = new BlbbDictDataCreateDTO();
+        BlbbDictDataUpdateDTO dto = new BlbbDictDataUpdateDTO();
         when(blbbDictDataService.updateData("1", dto)).thenReturn(true);
         CommonResult<Boolean> result = controller.updateData("1", dto);
         Assertions.assertEquals(2000, result.getCode());
